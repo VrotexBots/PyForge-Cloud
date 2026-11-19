@@ -1,0 +1,869 @@
+
+=======================================================
+LAST 25 MODIFIED SOURCE FILES
+=======================================================
+2026-11-16 13:54:02.962321 | dashboard_v2/startup-dashboard.js
+2026-11-16 13:47:10.998321 | dashboard_v2/index.html
+2026-11-16 13:39:27.562321 | runtime/test_startup_manager.py
+2026-11-16 13:35:43.934321 | runtime/startup_manager.py
+2026-11-16 13:29:06.834321 | main.py
+2026-11-16 13:15:23.766322 | projects/Vrotex Bot v1/ko.py
+2026-11-16 13:14:57.814322 | projects/Vrotex Bot v1/me.py
+2026-11-16 12:04:11.422076 | security_core/auth.py
+2026-11-16 11:53:27.802077 | security_core/routes.py
+2026-11-16 11:53:27.770077 | security_core/middleware.py
+2026-11-16 11:51:20.158077 | security_core/__init__.py
+2026-11-16 11:26:09.370078 | runtime/backup_guardian.py
+2026-11-16 11:22:58.294078 | runtime/pyforge-supervisor.sh
+2026-11-15 19:47:09.195840 | backup_factory/engine.py
+2026-11-15 18:00:58.115844 | repair_files_studio.py
+2026-11-15 17:44:24.987845 | projects/file_manager.py
+2026-11-15 16:40:41.499848 | monitoring/system_monitor.py
+2026-11-15 15:37:35.983850 | runtime/process_manager.py
+2026-11-15 12:50:52.847857 | projects/Vrotex Bot v1/main.py
+2026-11-15 12:12:07.227859 | projects/project_manager.py
+2026-11-15 11:25:34.063861 | dashboard/index.html
+2026-11-15 10:41:41.911863 | dashboard/app.js
+2026-11-15 10:18:21.679864 | configuration/config.py
+
+=======================================================
+TODO / FIXME / PENDING MARKERS
+=======================================================
+dashboard_v2/index.html:930: <section class="page" id="page-code"><h2>Code Studio</h2><p>Write and edit Python code.</p><div class="page-panel">Code editor connection pending.</div></section>
+dashboard_v2/index.html:1002: <section class="page" id="page-startup"><h2>PyForge Manager</h2><p>Manage project startup settings.</p><div class="page-panel">PyForge Manager connection pending.</div></section>
+dashboard_v2/index.html:1003: <section class="page" id="page-bots"><h2>Bot Manager</h2><p>Manage your Python bots and services.</p><div class="page-panel">Bot controls connection pending.</div></section>
+dashboard_v2/index.html:1111: <section class="page" id="page-storage"><h2>Cloud Storage</h2><p>Manage stored project data.</p><div class="page-panel">Storage connection pending.</div></section>
+dashboard_v2/index.html:1113: <section class="page" id="page-logs"><h2>Logs</h2><p>Review application and system events.</p><div class="page-panel">Log viewer connection pending.</div></section>
+
+=======================================================
+runtime/test_startup_manager.py
+=======================================================
+import sys
+import json
+import urllib.request
+import urllib.error
+from pathlib import Path
+
+BASE = Path.home() / "PyForge"
+DASHBOARD = BASE / "dashboard_v2"
+API = "http://127.0.0.1:8001"
+WEB = "http://127.0.0.1:8002"
+
+passed = 0
+failed = 0
+
+
+def test(name, condition, detail=""):
+    global passed, failed
+
+    if condition:
+        passed += 1
+        print(f"[PASS] {name}")
+    else:
+        failed += 1
+        print(f"[FAIL] {name}")
+
+    if detail:
+        print(f"       {detail}")
+
+
+def request(url, method="GET"):
+    req = urllib.request.Request(url, method=method)
+
+    try:
+        with urllib.request.urlopen(req, timeout=5) as response:
+            return response.status, response.read().decode(
+                "utf-8", errors="replace"
+            )
+    except urllib.error.HTTPError as error:
+        return error.code, error.read().decode(
+            "utf-8", errors="replace"
+        )
+    except Exception as error:
+        return 0, str(error)
+
+
+print("\n===================================")
+print(" PYFORGE STARTUP MANAGER TEST SUITE")
+print("===================================\n")
+
+# 1. Files
+backend = BASE / "runtime/startup_manager.py"
+js = DASHBOARD / "startup-dashboard.js"
+html = DASHBOARD / "index.html"
+
+test("Startup Manager backend exists", backend.is_file())
+test("Dashboard JavaScript exists", js.is_file())
+test("Dashboard HTML exists", html.is_file())
+
+# 2. Python compilation
+try:
+    compile(backend.read_text(), str(backend), "exec")
+    test("Backend Python syntax", True)
+except Exception as error:
+    test("Backend Python syntax", False, str(error))
+
+# 3. Dashboard connection
+if html.exists():
+    content = html.read_text(encoding="utf-8")
+    connected = '<script src="./startup-dashboard.js"></script>' in content
+    test("Dashboard script connected", connected)
+
+if js.exists():
+    js_content = js.read_text(encoding="utf-8")
+    for feature in (
+        "/api/startup/status",
+        "/api/startup/restart/api",
+        "/api/startup/restart/dashboard",
+        "/api/startup/wake-lock",
+        "setInterval"
+    ):
+        test(f"Dashboard feature: {feature}", feature in js_content)
+
+# 4. API health
+status, body = request(API + "/api/health")
+test("API responds HTTP 200", status == 200, body[:250])
+
+# 5. Startup Manager status
+status, body = request(API + "/api/startup/status")
+test("Startup Manager status endpoint", status == 200, body[:400])
+
+if status == 200:
+    try:
+        data = json.loads(body)
+        services = data.get("services", {})
+
+        for key in (
+            "api",
+            "dashboard",
+            "supervisor",
+            "backup_guardian"
+        ):
+            test(
+                f"Service status included: {key}",
+                key in services
+            )
+    except Exception as error:
+        test("Status response is valid JSON", False, str(error))
+
+# 6. Dashboard HTTP
+status, body = request(WEB + "/")
+test("Dashboard responds HTTP 200", status == 200)
+
+# 7. Security protection
+status, body = request(API + "/api/projects")
+test(
+    "Unauthenticated API access is protected",
+    status == 401,
+    f"HTTP {status}"
+)
+
+# 8. Final report
+print("\n===================================")
+print(" TEST RESULTS")
+print("===================================")
+print(f"PASSED: {passed}")
+print(f"FAILED: {failed}")
+print(f"TOTAL:  {passed + failed}")
+
+if failed == 0:
+    print("\nALL TESTS PASSED.")
+else:
+    print("\nSOME TESTS NEED ATTENTION.")
+
+print("===================================\n")
+
+sys.exit(0 if failed == 0 else 1)
+
+
+=======================================================
+runtime/startup_manager.py
+=======================================================
+from fastapi import APIRouter, HTTPException
+from datetime import datetime, timezone
+from pathlib import Path
+import os
+import signal
+import subprocess
+import threading
+import urllib.request
+import json
+from collections import deque
+
+router = APIRouter(tags=["Startup Manager"])
+
+BASE_DIR = Path.home() / "PyForge"
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+EVENT_LOG = LOG_DIR / "startup-manager.log"
+
+EVENTS = deque(maxlen=30)
+EVENT_LOCK = threading.Lock()
+WAKE_LOCK_REQUESTED = False
+
+
+def now():
+    return datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
+
+
+def record_event(message):
+    event = {"time": now(), "message": message}
+
+    with EVENT_LOCK:
+        EVENTS.appendleft(event)
+
+    try:
+        with EVENT_LOG.open("a", encoding="utf-8") as file:
+            file.write(json.dumps(event) + "\n")
+    except OSError:
+        pass
+
+
+def get_pids(pattern):
+    try:
+        result = subprocess.run(
+            ["pgrep", "-f", pattern],
+            capture_output=True,
+            text=True,
+            timeout=3
+        )
+
+        return [
+            int(line.strip())
+            for line in result.stdout.splitlines()
+            if line.strip().isdigit()
+        ]
+    except Exception:
+        return []
+
+
+def check_url(url):
+    try:
+        request = urllib.request.Request(
+            url,
+            headers={"User-Agent": "PyForge-Startup-Manager"}
+        )
+
+        with urllib.request.urlopen(request, timeout=3) as response:
+            return response.status == 200
+    except Exception:
+        return False
+
+
+def service_status(name, pattern, url=None):
+    pids = get_pids(pattern)
+    running = bool(pids)
+
+    healthy = check_url(url) if url else running
+
+    return {
+        "name": name,
+        "running": running,
+        "healthy": healthy,
+        "pids": pids,
+        "pid": pids[0] if pids else None
+    }
+
+
+def get_recent_events():
+    with EVENT_LOCK:
+        return list(EVENTS)
+
+
+@router.get("/api/startup/status")
+def startup_status():
+    services = {
+        "api": service_status(
+            "PyForge API",
+            "[u]vicorn main:app",
+            "http://127.0.0.1:8001/api/health"
+        ),
+        "dashboard": service_status(
+            "Dashboard",
+            "[p]ython -m http.server 8002",
+            "http://127.0.0.1:8002/"
+        ),
+        "supervisor": service_status(
+            "PyForge Supervisor",
+            "[p]yforge-supervisor.sh"
+        ),
+        "backup_guardian": service_status(
+            "Backup Guardian",
+            "[b]ackup_guardian.py"
+        )
+    }
+
+    return {
+        "ok": True,
+        "checked_at": now(),
+        "services": services,
+        "wake_lock": {
+            "requested": WAKE_LOCK_REQUESTED,
+            "note": (
+                "Wake Lock command was requested. "
+                "Android does not expose independent lock verification here."
+            )
+        },
+        "recent_events": get_recent_events()
+    }
+
+
+def stop_service(service):
+    if service == "api":
+        # The supervisor should relaunch the API after this process exits.
+        try:
+            os.kill(os.getpid(), signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+        return
+
+    if service == "dashboard":
+        pids = get_pids("[p]ython -m http.server 8002")
+
+        for pid in pids:
+            try:
+                os.kill(pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+
+
+@router.post("/api/startup/restart/{service}")
+def restart_service(service: str):
+    if service not in ("api", "dashboard"):
+        raise HTTPException(
+            status_code=400,
+            detail="Supported services: api, dashboard"
+        )
+
+    supervisor_pids = get_pids("[p]yforge-supervisor.sh")
+
+    if not supervisor_pids:
+        raise HTTPException(
+            status_code=503,
+            detail="Supervisor is not running. Automatic relaunch is unavailable."
+        )
+
+    threading.Timer(3.0, stop_service, args=(service,)).start()
+
+    record_event(f"Restart requested for {service}")
+
+    return {
+        "ok": True,
+        "service": service,
+        "message": (
+            f"{service} restart requested. "
+            "The supervisor should relaunch the service."
+        )
+    }
+
+
+@router.post("/api/startup/wake-lock")
+def request_wake_lock():
+    global WAKE_LOCK_REQUESTED
+
+    executable = "/data/data/com.termux/files/usr/bin/termux-wake-lock"
+
+    if not Path(executable).exists():
+        raise HTTPException(
+            status_code=503,
+            detail="termux-wake-lock was not found."
+        )
+
+    try:
+        subprocess.Popen(
+            [executable],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True
+        )
+
+        WAKE_LOCK_REQUESTED = True
+        record_event("Android wake-lock command requested")
+
+        return {
+            "ok": True,
+            "message": "Wake-lock command requested successfully."
+        }
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Wake-lock request failed: {error}"
+        )
+
+
+=======================================================
+runtime/backup_guardian.py
+=======================================================
+import os
+import sys
+import time
+import fcntl
+import traceback
+from datetime import datetime, timezone
+from pathlib import Path
+
+BASE = Path.home() / "PyForge"
+sys.path.insert(0, str(BASE))
+LOG_DIR = BASE / "logs"
+RUNTIME_DIR = BASE / "runtime"
+
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
+
+LOG_FILE = LOG_DIR / "backup-guardian.log"
+LOCK_FILE = RUNTIME_DIR / "backup-guardian.lock"
+
+INTERVAL_SECONDS = 6 * 60 * 60
+
+
+def log(message):
+    timestamp = datetime.now(timezone.utc).isoformat()
+    with LOG_FILE.open("a", encoding="utf-8") as file:
+        file.write(f"[{timestamp}] {message}\n")
+        file.flush()
+
+
+def main():
+    os.chdir(BASE)
+
+    # Prevent two Guardian instances from running together.
+    lock = LOCK_FILE.open("w")
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        log("Another Guardian instance already holds the lock. Exiting.")
+        return
+
+    from backup_factory.engine import create_backup, verify_backup
+
+    log("Backup Guardian started.")
+    log("Automatic backup interval: 6 hours.")
+    log("Existing backups will not be automatically deleted.")
+
+    while True:
+        try:
+            # Wait six hours after startup before the first scheduled backup.
+            time.sleep(INTERVAL_SECONDS)
+
+            log("Scheduled backup starting.")
+
+            backup = create_backup()
+            filename = backup["filename"]
+
+            log(
+                f"Backup created: {filename}; "
+                f"files: {backup.get('files_count', 'unknown')}"
+            )
+
+            result = verify_backup(filename)
+
+            if result.get("verified") is True:
+                log(
+                    f"VERIFIED: {filename}; "
+                    f"SHA256: {result.get('sha256', 'not reported')}"
+                )
+            else:
+                log(f"VERIFICATION FAILED: {filename}")
+
+        except Exception:
+            log("BACKUP ERROR:\n" + traceback.format_exc())
+
+
+if __name__ == "__main__":
+    main()
+
+
+=======================================================
+backup_factory/engine.py
+=======================================================
+import hashlib
+import json
+import os
+import tarfile
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+from configuration.config import BASE_DIR
+
+BACKUP_DIR = BASE_DIR / "backups" / "full"
+BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+
+EXCLUDED_DIRS = {
+    ".git", ".venv", "venv", "__pycache__", "node_modules"
+}
+EXCLUDED_FILES = {
+    ".env", ".env.local", ".env.production"
+}
+EXCLUDED_SUFFIXES = {
+    ".key", ".pem"
+}
+
+
+def _excluded(path):
+    relative = path.relative_to(BASE_DIR)
+    if any(part in EXCLUDED_DIRS for part in relative.parts):
+        return True
+    if any(part == "full" for part in relative.parts[:-1]) and relative.parts[0] == "backups":
+        return True
+    if path.name in EXCLUDED_FILES or path.suffix.lower() in EXCLUDED_SUFFIXES:
+        return True
+    if any(word in path.name.lower() for word in ("secret", "credential", "private_key")):
+        return True
+    return False
+
+
+def create_backup():
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
+    filename = f"PyForge-automatic-{timestamp}.tar.gz"
+    destination = BACKUP_DIR / filename
+
+    fd, temporary_name = tempfile.mkstemp(
+        prefix="pyforge-backup-", suffix=".tar.gz",
+        dir=str(BASE_DIR.parent)
+    )
+    os.close(fd)
+    temporary = Path(temporary_name)
+
+    files_count = 0
+    total_bytes = 0
+    excluded_count = 0
+
+    try:
+        with tarfile.open(temporary, "w:gz") as archive:
+            for current, directories, files in os.walk(BASE_DIR, followlinks=False):
+                current_path = Path(current)
+                kept_directories = []
+
+                for directory in directories:
+                    candidate = current_path / directory
+                    if candidate.is_symlink() or _excluded(candidate):
+                        excluded_count += 1
+                    else:
+                        kept_directories.append(directory)
+
+                directories[:] = kept_directories
+
+                for name in files:
+                    path = current_path / name
+                    if path.is_symlink() or not path.is_file() or _excluded(path):
+                        excluded_count += 1
+                        continue
+
+                    archive_name = path.relative_to(BASE_DIR).as_posix()
+                    archive.add(path, arcname=archive_name, recursive=False)
+                    files_count += 1
+                    total_bytes += path.stat().st_size
+
+        with tarfile.open(temporary, "r:gz") as check:
+            check.getmembers()
+
+        digest = hashlib.sha256(temporary.read_bytes()).hexdigest()
+        os.replace(temporary, destination)
+
+        metadata = {
+            "filename": filename,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "size_bytes": destination.stat().st_size,
+            "files_count": files_count,
+            "source_bytes": total_bytes,
+            "excluded_count": excluded_count,
+            "sha256": digest,
+            "verified": True,
+            "excluded_sensitive_files": True
+        }
+
+        metadata_path = destination.with_suffix(".json")
+        metadata_path.write_text(
+            json.dumps(metadata, indent=2),
+            encoding="utf-8"
+        )
+        destination.with_suffix(".sha256").write_text(
+            digest + "  " + filename + "\n",
+            encoding="utf-8"
+        )
+
+        return metadata
+
+    except Exception:
+        if temporary.exists():
+            temporary.unlink()
+        raise
+
+
+def list_backups():
+    results = []
+    for archive in sorted(BACKUP_DIR.glob("PyForge-automatic-*.tar.gz"), reverse=True):
+        metadata_path = archive.with_suffix(".json")
+        if metadata_path.is_file():
+            try:
+                results.append(json.loads(metadata_path.read_text(encoding="utf-8")))
+                continue
+            except (OSError, ValueError):
+                pass
+
+        results.append({
+            "filename": archive.name,
+            "size_bytes": archive.stat().st_size,
+            "verified": False,
+            "message": "Metadata missing or unreadable"
+        })
+    return {"count": len(results), "backups": results}
+
+
+def verify_backup(filename):
+    if not isinstance(filename, str) or Path(filename).name != filename:
+        raise ValueError("Invalid backup filename.")
+
+    if not filename.endswith(".tar.gz") or not filename.startswith("PyForge-automatic-"):
+        raise ValueError("Only Automatic Backup Factory archives can be verified.")
+
+    archive = BACKUP_DIR / filename
+    if not archive.is_file() or archive.is_symlink():
+        raise FileNotFoundError("Backup archive not found.")
+
+    digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+    checksum_path = archive.with_suffix(".sha256")
+
+    if not checksum_path.is_file():
+        raise ValueError("Checksum file is missing.")
+
+    expected = checksum_path.read_text(encoding="utf-8").split()[0]
+    if digest != expected:
+        raise ValueError("Backup checksum does not match.")
+
+    with tarfile.open(archive, "r:gz") as check:
+        members = check.getmembers()
+        for member in members:
+            target = Path(member.name)
+            if target.is_absolute() or ".." in target.parts:
+                raise ValueError("Unsafe path found inside backup.")
+            if member.issym() or member.islnk():
+                raise ValueError("Links are not allowed inside backup.")
+
+    return {
+        "filename": filename,
+        "verified": True,
+        "files_count": len(members),
+        "sha256": digest
+    }
+
+
+# PYFORGE_AUTOMATIC_RESTORE_V1
+
+def restore_backup(filename=None, confirm=False):
+    import shutil
+    from pathlib import PurePosixPath
+
+    backups = list_backups()["backups"]
+    selected = None
+    verification = None
+
+    if filename:
+        selected = filename
+        verification = verify_backup(selected)
+    else:
+        for item in backups:
+            try:
+                verification = verify_backup(item["filename"])
+                selected = item["filename"]
+                break
+            except Exception:
+                continue
+
+        if not selected:
+            raise ValueError("No verified recovery backup is available.")
+
+    if not confirm:
+        return {
+            "preview": True,
+            "confirmation_required": True,
+            "selected_backup": selected,
+            "verified": True,
+            "message": "Backup verified. Confirm before restoring."
+        }
+
+    archive_path = BACKUP_DIR / selected
+
+    staging = Path(tempfile.mkdtemp(
+        prefix="pyforge-restore-",
+        dir=str(BASE_DIR.parent)
+    ))
+
+    rollback_dir = Path(tempfile.mkdtemp(
+        prefix="pyforge-rollback-",
+        dir=str(BASE_DIR.parent)
+    ))
+
+    restored_files = 0
+    skipped_files = 0
+    applied = []
+
+    protected_files = {
+        ("main.py",),
+        ("backup_factory", "engine.py"),
+    }
+
+    try:
+        # Validate and stage every archive file before changing PyForge.
+        seen_paths = set()
+
+        with tarfile.open(archive_path, "r:gz") as archive:
+            for member in archive.getmembers():
+                if member.isdir():
+                    continue
+
+                if not member.isfile():
+                    raise ValueError("Unsupported file type in backup.")
+
+                if "\x00" in member.name or "\\" in member.name:
+                    raise ValueError("Unsafe path in backup.")
+
+                relative = PurePosixPath(member.name)
+
+                if (
+                    relative.is_absolute()
+                    or ".." in relative.parts
+                    or not relative.parts
+                    or ":" in relative.parts[0]
+                ):
+                    raise ValueError("Unsafe path in backup.")
+
+                if relative.parts in seen_paths:
+                    raise ValueError("Duplicate file path in backup.")
+
+                seen_paths.add(relative.parts)
+
+                if relative.parts[0] == "backups":
+                    skipped_files += 1
+                    continue
+
+                if relative.parts[:2] == (
+                    "backup_factory", "file_edits"
+                ):
+                    skipped_files += 1
+                    continue
+
+                if relative.parts in protected_files:
+                    skipped_files += 1
+                    continue
+
+                staged_file = staging.joinpath(*relative.parts)
+                staged_file.parent.mkdir(parents=True, exist_ok=True)
+
+                source_file = archive.extractfile(member)
+                if source_file is None:
+                    raise ValueError("Could not read a backup file.")
+
+                with source_file, staged_file.open("wb") as output:
+                    shutil.copyfileobj(source_file, output)
+
+        # Check every destination and preserve its current contents.
+        rollback_entries = []
+
+        for current, directories, files in os.walk(staging):
+            for name in files:
+                staged_file = Path(current) / name
+                relative = staged_file.relative_to(staging)
+                destination = BASE_DIR / relative
+
+                cursor = BASE_DIR
+                for part in relative.parts:
+                    cursor = cursor / part
+                    if cursor.is_symlink():
+                        raise ValueError(
+                            "Restore destination contains a symbolic link."
+                        )
+
+                base_resolved = BASE_DIR.resolve()
+                target_resolved = destination.resolve()
+
+                if os.path.commonpath([
+                    str(base_resolved),
+                    str(target_resolved)
+                ]) != str(base_resolved):
+                    raise ValueError("Restore destination is unsafe.")
+
+                if destination.exists() and not destination.is_file():
+                    raise ValueError(
+                        "Restore destination is not a regula
+
+=======================================================
+LAST API LOG ENTRIES
+=======================================================
+INFO:     127.0.0.1:35558 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35558 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35558 - "GET /api/monitoring/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35574 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52572 - "GET /api/startup/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52572 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52572 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52572 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35558 - "GET /api/monitoring/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49884 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/startup/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/monitoring/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49900 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35558 - "GET /api/startup/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35558 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35558 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35558 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/monitoring/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60370 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60354 - "GET /api/startup/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60354 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60354 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60354 - "GET /api/monitoring/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60380 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/startup/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60354 - "GET /api/monitoring/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53248 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53234 - "GET /api/startup/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53234 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40668 - "GET / HTTP/1.1" 200 OK
+
+=======================================================
+LAST GUARDIAN ERRORS
+=======================================================
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 76, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 76, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 76, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 76, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 76, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'

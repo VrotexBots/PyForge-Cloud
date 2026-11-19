@@ -1,0 +1,22 @@
+<div class="vision-card" id="vision-ai-engine-panel">
+  <h3>AI Vision Analysis & Precision Editor</h3>
+  <p class="vision-muted">Analyze the uploaded reference, then issue a targeted instruction. Unrequested design elements remain protected.</p>
+  <h4>AI Provider Configuration</h4>
+  <p class="vision-muted">Enter your own provider API key. It is stored locally in PyForge with owner-only permissions. Never share the key in chat.</p>
+  <input class="vision-input" id="vf-api-key" type="password" autocomplete="off" placeholder="Provider API key">
+  <input class="vision-input" id="vf-base-url" value="https://api.openai.com/v1" placeholder="HTTPS provider base URL">
+  <input class="vision-input" id="vf-vision-model" value="gpt-4o-mini" placeholder="Vision/chat model">
+  <input class="vision-input" id="vf-audio-model" value="whisper-1" placeholder="Audio transcription model">
+  <button class="vision-button" id="vf-save-provider" type="button">Save AI provider settings</button>
+  <button class="vision-button" id="vf-analyze" type="button">Analyze original screenshot</button>
+  <div class="vision-status" id="vf-ai-status">Checking AI provider...</div>
+  <h4>Written editing instruction</h4>
+  <textarea class="vision-input" id="vf-instruction" rows="3" placeholder="Change only the requested element. Example: move the navigation to the left."></textarea>
+  <button class="vision-button" id="vf-edit" type="button">Reconstruct / apply targeted AI edit</button>
+  <h4>Voice instruction</h4>
+  <button class="vision-button" id="vf-record" type="button">Start voice recording</button>
+  <button class="vision-button" id="vf-stop" type="button" disabled>Stop and transcribe</button>
+  <audio id="vf-audio" controls hidden style="width:100%"></audio>
+  <div class="vision-status" id="vf-voice-status">Voice transcription requires a configured audio provider.</div>
+  <div class="vision-status" id="vf-edit-status">No AI edit has been applied yet.</div>
+</div>

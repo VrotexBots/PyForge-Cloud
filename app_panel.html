@@ -1,0 +1,25 @@
+<div class="vision-card" id="vision-full-build-panel">
+  <h3>Interactive Editor, Build & Export</h3>
+  <p class="vision-muted">Review generated source before building. The original reference remains unchanged.</p>
+  <label>HTML source</label><textarea class="vision-input" id="vf-html" rows="8" spellcheck="false"></textarea>
+  <label>CSS source</label><textarea class="vision-input" id="vf-css" rows="6" spellcheck="false"></textarea>
+  <label>JavaScript source</label><textarea class="vision-input" id="vf-js" rows="6" spellcheck="false"></textarea>
+  <button class="vision-button" id="vf-refresh-preview" type="button">Refresh interactive draft preview</button>
+  <h4>Visual Fidelity Comparison</h4>
+  <p class="vision-muted">Capture a screenshot of the generated preview, then compare it against the original master reference.</p>
+  <input class="vision-input" id="vf-compare-file" type="file" accept="image/png,image/jpeg,image/webp">
+  <button class="vision-button" id="vf-compare" type="button">Compare generated screenshot with original</button>
+  <div class="vision-status" id="vf-compare-status">No visual comparison yet.</div>
+  <button class="vision-button" id="vf-select-mode" type="button">Enable visual element selection</button>
+  <div class="vision-status" id="vf-selected-element">No element selected. Enable selection and tap an element in the preview.</div>
+  <label>CSS adjustment for selected element</label><textarea class="vision-input" id="vf-selected-css" rows="3" placeholder="Example: margin-left: 20px; color: #ffffff;"></textarea>
+  <button class="vision-button" id="vf-apply-css" type="button">Apply selected element styling</button>
+  <iframe id="vf-preview" title="Generated application preview" sandbox="allow-scripts" style="width:100%;height:520px;background:white;border:1px solid #46516a;border-radius:12px"></iframe>
+  <button class="vision-button" id="vf-build" type="button">Generate web app + Python backend</button>
+  <button class="vision-button" id="vf-test" type="button">Run automatic tests</button>
+  <button class="vision-button" id="vf-repair" type="button">Ask AI to repair failed tests</button>
+  <button class="vision-button" id="vf-publish" type="button">Save approved app into selected PyForge project</button>
+  <button class="vision-button" id="vf-pwa" type="button">Download tested PWA</button>
+  <button class="vision-button" id="vf-android" type="button">Create Android project package</button>
+  <div class="vision-status" id="vf-build-status">No build created yet.</div>
+</div>

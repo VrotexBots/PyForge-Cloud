@@ -1,0 +1,13 @@
+VALIDATION PERFORMED WHEN PREPARING THIS PACKAGE
+- Python bytecode compilation: vision_studio/advanced.py passed.
+- Python bytecode compilation: installer.py passed.
+- JavaScript parser check: vision_ui.js passed with Node.js.
+- Installer simulation against a copy of the supplied source bundle passed.
+- The added advanced router imported successfully and registered its routes.
+- The simulated installer changed only main.py and dashboard_v2/index.html and created timestamped backups.
+
+NOT PERFORMED
+- No provider API key was available, so no live vision, transcription, generation, or AI repair request was made.
+- No browser login session was available for end-to-end UI interaction testing.
+- No Android SDK/JDK/Gradle toolchain was provided for APK compilation.
+- No generated application was deployed publicly.

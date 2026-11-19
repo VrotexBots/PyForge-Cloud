@@ -1,0 +1,1548 @@
+
+============================================================
+PYFORGE DEVELOPMENT HANDOFF
+============================================================
+Latest development state - read only
+
+============================================================
+MAIN.PY - ROUTE REGISTRATIONS
+============================================================
+62:app.include_router(security_router)
+63:app.include_router(startup_router)
+101:@app.get("/")
+110:@app.get("/api/health")
+119:@app.get("/api/projects")
+125:@app.post("/api/projects", status_code=201)
+135:@app.get("/api/projects/{name}")
+148:@app.get("/api/projects/{name}/files")
+158:@app.get("/api/projects/{name}/file")
+168:@app.post("/api/projects/{name}/file", status_code=201)
+180:@app.post("/api/projects/{name}/folder", status_code=201)
+192:@app.put("/api/projects/{name}/file")
+221:@app.post("/api/projects/{name}/item/rename")
+233:@app.post("/api/projects/{name}/item/duplicate")
+245:@app.delete("/api/projects/{name}/item")
+255:@app.get("/api/projects/{name}/download")
+274:@app.get("/api/projects/{name}/download-zip")
+291:@app.patch("/api/projects/{name}")
+306:@app.delete("/api/projects/{name}")
+346:@app.get("/api/console/projects")
+353:@app.get("/api/console/status")
+358:@app.get("/api/console/status/{project}")
+363:@app.get("/api/console/history/{project}")
+371:@app.post("/api/console/start")
+383:@app.post("/api/console/restart")
+395:@app.post("/api/console/stop")
+400:@app.get("/api/console/logs/{run_id}")
+418:@app.get("/api/monitoring/summary")
+432:@app.post("/api/backups")
+443:@app.get("/api/backups")
+448:@app.post("/api/backups/verify")
+460:@app.post("/api/backups/restore")
+
+============================================================
+STARTUP MANAGER BACKEND
+============================================================
+from fastapi import APIRouter, HTTPException
+from datetime import datetime, timezone
+from pathlib import Path
+import os
+import signal
+import subprocess
+import threading
+import urllib.request
+import json
+from collections import deque
+
+router = APIRouter(tags=["Startup Manager"])
+
+BASE_DIR = Path.home() / "PyForge"
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+EVENT_LOG = LOG_DIR / "startup-manager.log"
+
+EVENTS = deque(maxlen=30)
+EVENT_LOCK = threading.Lock()
+WAKE_LOCK_REQUESTED = False
+
+
+def now():
+    return datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
+
+
+def record_event(message):
+    event = {"time": now(), "message": message}
+
+    with EVENT_LOCK:
+        EVENTS.appendleft(event)
+
+    try:
+        with EVENT_LOG.open("a", encoding="utf-8") as file:
+            file.write(json.dumps(event) + "\n")
+    except OSError:
+        pass
+
+
+def get_pids(pattern):
+    try:
+        result = subprocess.run(
+            ["pgrep", "-f", pattern],
+            capture_output=True,
+            text=True,
+            timeout=3
+        )
+
+        return [
+            int(line.strip())
+            for line in result.stdout.splitlines()
+            if line.strip().isdigit()
+        ]
+    except Exception:
+        return []
+
+
+def check_url(url):
+    try:
+        request = urllib.request.Request(
+            url,
+            headers={"User-Agent": "PyForge-Startup-Manager"}
+        )
+
+        with urllib.request.urlopen(request, timeout=3) as response:
+            return response.status == 200
+    except Exception:
+        return False
+
+
+def service_status(name, pattern, url=None):
+    pids = get_pids(pattern)
+    running = bool(pids)
+
+    healthy = check_url(url) if url else running
+
+    return {
+        "name": name,
+        "running": running,
+        "healthy": healthy,
+        "pids": pids,
+        "pid": pids[0] if pids else None
+    }
+
+
+def get_recent_events():
+    with EVENT_LOCK:
+        return list(EVENTS)
+
+
+@router.get("/api/startup/status")
+def startup_status():
+    services = {
+        "api": service_status(
+            "PyForge API",
+            "[u]vicorn main:app",
+            "http://127.0.0.1:8001/api/health"
+        ),
+        "dashboard": service_status(
+            "Dashboard",
+            "[p]ython -m http.server 8002",
+            "http://127.0.0.1:8002/"
+        ),
+        "supervisor": service_status(
+            "PyForge Supervisor",
+            "[p]yforge-supervisor.sh"
+        ),
+        "backup_guardian": service_status(
+            "Backup Guardian",
+            "[b]ackup_guardian.py"
+        )
+    }
+
+    return {
+        "ok": True,
+        "checked_at": now(),
+        "services": services,
+        "wake_lock": {
+            "requested": WAKE_LOCK_REQUESTED,
+            "note": (
+                "Wake Lock command was requested. "
+                "Android does not expose independent lock verification here."
+            )
+        },
+        "recent_events": get_recent_events()
+    }
+
+
+def stop_service(service):
+    if service == "api":
+        # The supervisor should relaunch the API after this process exits.
+        try:
+            os.kill(os.getpid(), signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+        return
+
+    if service == "dashboard":
+        pids = get_pids("[p]ython -m http.server 8002")
+
+        for pid in pids:
+            try:
+                os.kill(pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+
+
+@router.post("/api/startup/restart/{service}")
+def restart_service(service: str):
+    if service not in ("api", "dashboard"):
+        raise HTTPException(
+            status_code=400,
+            detail="Supported services: api, dashboard"
+        )
+
+    supervisor_pids = get_pids("[p]yforge-supervisor.sh")
+
+    if not supervisor_pids:
+        raise HTTPException(
+            status_code=503,
+            detail="Supervisor is not running. Automatic relaunch is unavailable."
+        )
+
+    threading.Timer(3.0, stop_service, args=(service,)).start()
+
+    record_event(f"Restart requested for {service}")
+
+    return {
+        "ok": True,
+        "service": service,
+        "message": (
+            f"{service} restart requested. "
+            "The supervisor should relaunch the service."
+        )
+    }
+
+
+@router.post("/api/startup/wake-lock")
+def request_wake_lock():
+    global WAKE_LOCK_REQUESTED
+
+    executable = "/data/data/com.termux/files/usr/bin/termux-wake-lock"
+
+    if not Path(executable).exists():
+        raise HTTPException(
+            status_code=503,
+            detail="termux-wake-lock was not found."
+        )
+
+    try:
+        subprocess.Popen(
+            [executable],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            start_new_session=True
+        )
+
+        WAKE_LOCK_REQUESTED = True
+        record_event("Android wake-lock command requested")
+
+        return {
+            "ok": True,
+            "message": "Wake-lock command requested successfully."
+        }
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Wake-lock request failed: {error}"
+        )
+
+
+============================================================
+STARTUP DASHBOARD JAVASCRIPT
+============================================================
+(() => {
+    "use strict";
+
+    if (window.__pyforgeManagerInitialized) return;
+    window.__pyforgeManagerInitialized = true;
+
+    const API = "http://127.0.0.1:8001";
+    const REFRESH_INTERVAL = 5000;
+
+    let refreshTimer = null;
+    let refreshing = false;
+
+    const serviceNames = [
+        ["api", "PyForge API"],
+        ["dashboard", "Dashboard"],
+        ["supervisor", "PyForge Supervisor"],
+        ["backup_guardian", "Backup Guardian"]
+    ];
+
+    function createPage() {
+        let page = document.getElementById("page-startup");
+
+        if (!page) {
+            page = document.createElement("section");
+            page.id = "page-startup";
+            page.className = "page";
+
+            const parent =
+                document.querySelector("main") ||
+                document.querySelector(".main-content") ||
+                document.querySelector(".content") ||
+                document.body;
+
+            parent.appendChild(page);
+        }
+
+        page.innerHTML = `
+            <div class="pf-startup">
+
+                <div class="pf-startup-heading">
+                    <div>
+                        <div class="pf-startup-eyebrow">
+                            PYFORGE CLOUD CONTROL
+                        </div>
+                        <h2>PyForge Manager</h2>
+                        <p>
+                            Infrastructure monitoring and service control.
+                        </p>
+                    </div>
+
+                    <div class="pf-startup-live">
+                        <span class="pf-startup-dot"></span>
+                        LIVE MONITOR
+                    </div>
+                </div>
+
+                <div class="pf-startup-toolbar">
+                    <button id="pf-startup-refresh">
+                        Refresh Status
+                    </button>
+                    <span id="pf-startup-updated">
+                        Waiting for first status check...
+                    </span>
+                </div>
+
+                <div id="pf-startup-message"
+                     class="pf-startup-message">
+                    Connecting to PyForge...
+                </div>
+
+                <h3 class="pf-startup-section-title">
+                    Infrastructure Services
+                </h3>
+
+                <div class="pf-startup-grid"
+                     id="pf-startup-services">
+                    ${serviceNames.map(([key, name]) => `
+                        <div class="pf-startup-card"
+                             id="pf-card-${key}">
+                            <h3>${name}</h3>
+                            <p class="pf-startup-status">
+                                CHECKING...
+                            </p>
+                            <p>Waiting for service information...</p>
+                        </div>
+                    `).join("")}
+                </div>
+
+                <div class="pf-startup-panel">
+                    <h3>Service Controls</h3>
+                    <p>
+                        Restart supported services or request an
+                        Android wake lock.
+                    </p>
+
+                    <div class="pf-startup-actions">
+                        <button id="pf-startup-restart-api">
+                            Restart API
+                        </button>
+
+                        <button id="pf-startup-restart-dashboard">
+                            Restart Dashboard
+                        </button>
+
+                        <button id="pf-startup-wake-lock">
+                            Request Wake Lock
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pf-startup-panel">
+                    <h3>Recent Events</h3>
+                    <div id="pf-startup-events">
+                        Waiting for events...
+                    </div>
+                </div>
+
+                <div class="pf-startup-panel">
+                    <h3>Technical Status</h3>
+                    <pre id="pf-startup-technical">Waiting for API response...</pre>
+                </div>
+
+            </div>
+        `;
+
+        addStyles();
+        connectButtons();
+    }
+
+    function addStyles() {
+        if (document.getElementById("pf-startup-styles")) return;
+
+        const style = document.createElement("style");
+        style.id = "pf-startup-styles";
+
+        style.textContent = `
+            .pf-startup {
+                color: #eaf1ff;
+                padding: 20px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .pf-startup-heading {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 15px;
+                margin-bottom: 22px;
+            }
+
+            .pf-startup-eyebrow {
+                color: #39aaff;
+                font-size: 11px;
+                letter-spacing: 2px;
+                font-weight: bold;
+            }
+
+            .pf-startup-heading h2 {
+                margin: 8px 0;
+                font-size: 26px;
+            }
+
+            .pf-startup-heading p,
+            .pf-startup-panel p {
+                color: #9baac4;
+                line-height: 1.6;
+            }
+
+            .pf-startup-live {
+                border: 1px solid #236c62;
+                color: #65edb9;
+                padding: 9px 13px;
+                border-radius: 20px;
+                font-size: 11px;
+                letter-spacing: 1px;
+            }
+
+            .pf-startup-dot {
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                background: #35e7a1;
+                border-radius: 50%;
+                margin-right: 7px;
+            }
+
+            .pf-startup-toolbar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 12px;
+                margin-bottom: 18px;
+            }
+
+            .pf-startup-toolbar span {
+                color: #91a0b9;
+                font-size: 12px;
+            }
+
+            .pf-startup-section-title {
+                margin: 20px 0 12px;
+                color: #dceaff;
+            }
+
+            .pf-startup-grid {
+                display: grid;
+                grid-template-columns:
+                    repeat(auto-fit, minmax(190px, 1fr));
+                gap: 13px;
+                margin-bottom: 20px;
+            }
+
+            .pf-startup-card,
+            .pf-startup-panel {
+                background: rgba(15, 27, 48, 0.96);
+                border: 1px solid rgba(77, 132, 190, 0.25);
+                border-radius: 13px;
+                padding: 17px;
+                margin-bottom: 15px;
+                box-sizing: border-box;
+                min-width: 0;
+            }
+
+            .pf-startup-card h3,
+            .pf-startup-panel h3 {
+                margin: 0 0 12px;
+                font-size: 15px;
+            }
+
+            .pf-startup-card p {
+                margin: 6px 0;
+                color: #aab8ce;
+                font-size: 13px;
+                overflow-wrap: anywhere;
+            }
+
+            .pf-startup-status {
+                font-weight: bold;
+                margin-bottom: 8px !important;
+            }
+
+            .pf-startup-ok {
+                color: #55e6aa !important;
+            }
+
+            .pf-startup-bad {
+                color: #ff7777 !important;
+            }
+
+            .pf-startup-warn {
+                color: #ffc66d !important;
+            }
+
+            .pf-startup-actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 16px;
+            }
+
+            .pf-startup button {
+                background: linear-gradient(
+                    135deg, #1268b9, #593fba
+                );
+                color: white;
+                border: 0;
+                border-radius: 8px;
+                padding: 11px 15px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+
+            .pf-startup button:disabled {
+                opacity: 0.5;
+                cursor: wait;
+            }
+
+            .pf-startup-message {
+                margin: 15px 0;
+                padding: 12px;
+                border-radius: 8px;
+                background: rgba(42, 75, 115, 0.25);
+                color: #b9d9ff;
+                font-size: 13px;
+                overflow-wrap: anywhere;
+            }
+
+            #pf-startup-events {
+                color: #b5c4da;
+                font-size: 13px;
+                line-height: 1.9;
+                overflow-wrap: anywhere;
+            }
+
+            #pf-startup-technical {
+                white-space: pre-wrap;
+                overflow-wrap: anywhere;
+                color: #a9c9ec;
+                font-size: 11px;
+                line-height: 1.6;
+                max-height: 400px;
+                overflow: auto;
+            }
+
+            @media(max-width: 600px) {
+                .pf-startup {
+                    padding: 12px;
+                }
+
+                .pf-startup-heading h2 {
+                    font-size: 22px;
+                }
+
+                .pf-startup-actions button {
+                    width: 100%;
+                }
+            }
+        `;
+
+        document.head.appendChild(style);
+    }
+
+    function message(text) {
+        const element =
+            document.getElementById("pf-startup-message");
+
+        if (element) element.textContent = text;
+    }
+
+    function technical(text) {
+        const element =
+            document.getElementById("pf-startup-technical");
+
+        if (element) element.textContent = text;
+    }
+
+    async function apiRequest(path, method = "GET") {
+        const headers = {
+            "Accept": "application/json"
+        };
+
+        if (method !== "GET") {
+            headers["Content-Type"] = "application/json";
+
+            try {
+                const csrf = sessionStorage.getItem("pyforge_csrf");
+                if (csrf) headers["X-CSRF-Token"] = csrf;
+            } catch (_) {}
+        }
+
+        const response = await fetch(API + path, {
+            method,
+            credentials: "include",
+            headers
+        });
+
+        let data = {};
+
+        try {
+            data = await response.json();
+        } catch (_) {
+            data = {};
+        }
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error(
+                    "LOGIN REQUIRED: Your session is missing or expired. Log in to PyForge and refresh this page."
+                );
+            }
+
+            if (response.status === 403) {
+                throw new Error(
+                    "ACCESS DENIED: Check your session and security permissions."
+                );
+            }
+
+            throw new Error(
+                data.detail ||
+                `API request failed with HTTP ${response.status}`
+            );
+        }
+
+        return data;
+    }
+
+    function renderServices(services) {
+        serviceNames.forEach(([key, label]) => {
+            const card =
+                document.getElementById("pf-card-" + key);
+
+            if (!card) return;
+
+            const service = services[key];
+
+            card.innerHTML = "";
+
+            const heading = document.createElement("h3");
+            heading.textContent = label;
+
+            const status = document.createElement("p");
+            status.className = "pf-startup-status";
+
+            const pid = document.createElement("p");
+            const pids = document.createElement("p");
+
+            if (!service) {
+                status.className += " pf-startup-bad";
+                status.textContent = "STATUS UNAVAILABLE";
+                pid.textContent = "No service information returned.";
+                card.append(heading, status, pid);
+                return;
+            }
+
+            if (service.healthy === true) {
+                status.className += " pf-startup-ok";
+                status.textContent = "● RUNNING / HEALTHY";
+            } else if (service.running === true) {
+                status.className += " pf-startup-warn";
+                status.textContent =
+                    "● RUNNING / HEALTH CHECK FAILED";
+            } else {
+                status.className += " pf-startup-bad";
+                status.textContent = "● OFFLINE";
+            }
+
+            pid.textContent = service.pid
+                ? "Process ID: " + service.pid
+                : "Process ID: unavailable";
+
+            pids.textContent =
+                "Detected processes: " +
+                (Array.isArray(service.pids)
+                    ? service.pids.join(", ") || "None"
+                    : "Not reported");
+
+            card.append(heading, status, pid, pids);
+        });
+    }
+
+    function renderEvents(events) {
+        const container =
+            document.getElementById("pf-startup-events");
+
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        if (!Array.isArray(events) || events.length === 0) {
+            container.textContent = "No recent events reported.";
+            return;
+        }
+
+        events.forEach(event => {
+            const row = document.createElement("div");
+
+            row.textContent =
+                `${event.time || "Unknown time"} — ` +
+                `${event.message || "Event"}`;
+
+            container.appendChild(row);
+        });
+    }
+
+    function showFailure(error) {
+        const text = error && error.message
+            ? error.message
+            : String(error);
+
+        message("Could not load PyForge status: " + text);
+        technical("STATUS REQUEST FAILED\n\n" + text);
+
+        serviceNames.forEach(([key]) => {
+            const card =
+                document.getElementById("pf-card-" + key);
+
+            if (!card) return;
+
+            const status = card.querySelector(".pf-startup-status");
+
+            if (status) {
+                status.className =
+                    "pf-startup-status pf-startup-bad";
+
+                status.textContent =
+                    text.includes("LOGIN REQUIRED")
+                        ? "LOGIN REQUIRED"
+                        : "STATUS CHECK FAILED";
+            }
+
+            const details = card.querySelectorAll("p");
+
+            if (details[1]) {
+                details[1].textContent = text;
+            }
+        });
+    }
+
+    async function refreshStatus() {
+        if (refreshing) return;
+
+        refreshing = true;
+
+        try {
+            const data = await apiRequest("/api/startup/status");
+
+            if (!data || data.ok !== true) {
+                throw new Error(
+                    "The API responded, but did not confirm a successful status check."
+                );
+            }
+
+            renderServices(data.services || {});
+            renderEvents(data.recent_events || []);
+
+            technical(JSON.stringify(data, null, 2));
+
+            const updated =
+                document.getElementById("pf-startup-updated");
+
+            if (updated) {
+                updated.textContent =
+                    "Last updated: " +
+                    (data.checked_at || new Date().toLocaleString());
+            }
+
+            message(
+                "Connected. PyForge infrastructure status received."
+            );
+
+        } catch (error) {
+            showFailure(error);
+        } finally {
+            refreshing = false;
+        }
+    }
+
+    async function runAction(path, label) {
+        const buttons = document.querySelectorAll(
+            ".pf-startup-actions button"
+        );
+
+        buttons.forEach(button => {
+            button.disabled = true;
+        });
+
+        message(label + " request being sent...");
+
+        try {
+            const result = await apiRequest(path, "POST");
+
+            message(
+                result.message || label + " request accepted."
+            );
+
+            technical(JSON.stringify(result, null, 2));
+
+            // Allow a restarted service time to return.
+            window.setTimeout(refreshStatus, 4000);
+
+        } catch (error) {
+            message(label + " failed: " + error.message);
+            technical("ACTION FAILED\n\n" + error.message);
+        } finally {
+            buttons.forEach(button => {
+                button.disabled = false;
+            });
+        }
+    }
+
+    function connectButtons() {
+        const refresh =
+            document.getElementById("pf-startup-refresh");
+
+        const restartApi =
+            document.getElementById("pf-startup-restart-api");
+
+        const restartDashboard =
+            document.getElementById(
+                "pf-startup-restart-dashboard"
+            );
+
+        const wakeLock =
+            document.getElementById("pf-startup-wake-lock");
+
+        if (refresh) {
+            refresh.addEventListener("click", refreshStatus);
+        }
+
+        if (restartApi) {
+            restartApi.addEventListener("click", () => {
+                runAction(
+                    "/api/startup/restart/api",
+                    "API restart"
+                );
+            });
+        }
+
+        if (restartDashboard) {
+            restartDashboard.addEventListener("click", () => {
+                runAction(
+                    "/api/startup/restart/dashboard",
+                    "Dashboard restart"
+                );
+            });
+        }
+
+        if (wakeLock) {
+            wakeLock.addEventListener("click", () => {
+                runAction(
+                    "/api/startup/wake-lock",
+                    "Wake-lock"
+                );
+            });
+        }
+    }
+
+    function initialize() {
+        createPage();
+
+        // First check starts immediately.
+        refreshStatus();
+
+        // Continue checking every five seconds.
+        if (refreshTimer) {
+            window.clearInterval(refreshTimer);
+        }
+
+        refreshTimer = 
+[TRUNCATED]
+
+============================================================
+DASHBOARD UNFINISHED SECTIONS
+============================================================
+928-</section>
+929-
+930:    <section class="page" id="page-code"><h2>Code Studio</h2><p>Write and edit Python code.</p><div class="page-panel">Code editor connection pending.</div></section>
+931-    
+932-<section class="page" id="page-console">
+933-  <h2>Console / Terminal</h2>
+--
+1000-</section>
+1001-
+1002:    <section class="page" id="page-startup"><h2>PyForge Manager</h2><p>Manage project startup settings.</p><div class="page-panel">PyForge Manager connection pending.</div></section>
+1003:    <section class="page" id="page-bots"><h2>Bot Manager</h2><p>Manage your Python bots and services.</p><div class="page-panel">Bot controls connection pending.</div></section>
+1004-    <section class="page" id="page-monitoring">
+1005-  <h2>System Monitoring</h2>
+1006-  <p>Live system readings and independent project process health.</p>
+--
+1109-</section>
+1110-
+1111:    <section class="page" id="page-storage"><h2>Cloud Storage</h2><p>Manage stored project data.</p><div class="page-panel">Storage connection pending.</div></section>
+1112-    <section class="page" id="page-settings"><h2>Settings</h2><p>Configure your PyForge workspace.</p><div class="page-panel">Workspace settings will appear here.</div></section>
+1113:    <section class="page" id="page-logs"><h2>Logs</h2><p>Review application and system events.</p><div class="page-panel">Log viewer connection pending.</div></section>
+1114-  </main>
+1115-
+1116-  <div class="drawer-backdrop" id="backdrop"></div>
+
+============================================================
+SECURITY ROUTES
+============================================================
+from fastapi import APIRouter, HTTPException, Request, Response
+from pydantic import BaseModel, Field
+
+from security_core import auth
+
+
+router = APIRouter(prefix="/api/auth", tags=["Security"])
+
+
+class LoginRequest(BaseModel):
+    username: str = Field(..., min_length=1, max_length=64)
+    password: str = Field(..., min_length=1, max_length=256)
+
+
+def client_key(request):
+    if request.client:
+        return request.client.host
+    return "unknown"
+
+
+@router.get("/status")
+def security_status():
+    return {
+        "owner_configured": auth.owner_exists(),
+        "authentication": "enabled"
+    }
+
+
+@router.post("/login")
+def owner_login(data: LoginRequest, request: Request, response: Response):
+    try:
+        result = auth.login(
+            data.username,
+            data.password,
+            client_key(request)
+        )
+    except PermissionError as error:
+        raise HTTPException(status_code=401, detail=str(error))
+    except RuntimeError as error:
+        raise HTTPException(status_code=503, detail=str(error))
+
+    secure_cookie = request.url.scheme == "https"
+
+    response.set_cookie(
+        key="pyforge_session",
+        value=result["token"],
+        max_age=12 * 60 * 60,
+        httponly=True,
+        secure=secure_cookie,
+        samesite="strict",
+        path="/"
+    )
+
+    return {
+        "authenticated": True,
+        "username": result["username"],
+        "csrf_token": result["csrf_token"],
+        "expires_at": result["expires_at"]
+    }
+
+
+@router.get("/me")
+def current_owner(request: Request):
+    user = getattr(request.state, "user", None)
+
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated.")
+
+    return {
+        "authenticated": True,
+        "username": user["username"],
+        "expires_at": user["expires_at"]
+    }
+
+
+@router.post("/logout")
+def owner_logout(request: Request, response: Response):
+    token = request.cookies.get("pyforge_session")
+
+    auth.logout(token, client_key(request))
+
+    response.delete_cookie(
+        key="pyforge_session",
+        path="/",
+        httponly=True,
+        secure=request.url.scheme == "https",
+        samesite="strict"
+    )
+
+    return {"authenticated": False, "message": "Logged out."}
+
+
+============================================================
+MAIN.PY IMPORTS AND CONFIGURATION
+============================================================
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
+from security_core.middleware import SecurityMiddleware
+from security_core.routes import router as security_router
+from runtime.startup_manager import router as startup_router
+from pydantic import BaseModel, Field
+
+from configuration.config import APP_NAME, APP_VERSION
+from backup_factory.engine import (
+    create_backup,
+    list_backups,
+    verify_backup,
+    restore_backup,
+)
+
+from projects.project_manager import (
+    list_projects,
+    get_project,
+    create_project,
+    rename_project,
+    delete_project,
+)
+from projects.file_manager import (
+    list_files,
+    read_file,
+    save_file,
+    create_file,
+    create_folder,
+    rename_item,
+    duplicate_file,
+    delete_item,
+    create_project_zip,
+)
+
+app = FastAPI(
+    title=APP_NAME,
+    version=APP_VERSION,
+    description="Private Python development and server platform",
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
+)
+
+# Security middleware protects API operations.
+app.add_middleware(SecurityMiddleware)
+
+# CORS is outermost so browser preflight and security error responses work.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://127.0.0.1:8002",
+        "http://localhost:8002",
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Content-Type", "X-CSRF-Token"],
+)
+
+app.include_router(security_router)
+app.include_router(startup_router)
+
+
+class ProjectCreateRequest(BaseModel):
+    name: str
+
+
+class ProjectRenameRequest(BaseModel):
+    new_name: str
+
+
+class ProjectDeleteRequest(BaseModel):
+    confirm: bool = False
+
+
+class FileSaveRequest(BaseModel):
+    path: str
+    content: str = Field(..., max_length=1048576)
+
+
+class FileCreateRequest(BaseModel):
+    path: str
+    content: str = Field(default="", max_length=1048576)
+
+
+class FolderCreateRequest(BaseModel):
+    path: str
+
+
+class FileItemRenameRequest(BaseModel):
+    path: str
+    new_name: str
+
+
+class FileItemPathRequest(BaseModel):
+    path: str
+
+
+@app.get("/")
+def home():
+    return {
+        "platform": APP_NAME,
+        "version": APP_VERSION,
+        "message": "PyForge Cloud backend is running."
+    }
+
+
+@app.get("/api/health")
+def health():
+    return {
+        "status": "online",
+        "platform": APP_NAME,
+        "version": APP_VERSION
+    }
+
+
+@app.get("/api/projects")
+def projects():
+    result = list_projects()
+    return {"count": len(result), "projects": result}
+
+
+@app.post("/api/projects", status_code=201)
+def create_new_project(request: ProjectCreateRequest):
+    try:
+        return create_project(request.name)
+    except FileExistsError as error:
+        raise HTTPException(status_code=409, detail=str(error))
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error))
+
+
+@app.get("/api/projects/{name}")
+def project_details(name: str):
+    try:
+        project = get_project(name)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error))
+
+    if project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    return project
+
+
+@app.get("/api/projects/{name}/files")
+def project_files(name: str, directory: str = ""):
+    try:
+        return list_files(name, directory)
+    except FileNotFoundError as error:
+        raise HTTPException(status_code=404, detail=str(error))
+    except (ValueError, NotADirectoryError) as error:
+        raise HTTPException(status_code=400, detail=str(error))
+
+
+@app.get("/api/projects/{name}/file")
+def open_project_file(name: str, path: str):
+    try:
+
+============================================================
+GUARDIAN SOURCE
+============================================================
+import os
+import sys
+import time
+import fcntl
+import traceback
+from datetime import datetime, timezone
+from pathlib import Path
+
+BASE = Path.home() / "PyForge"
+sys.path.insert(0, str(BASE))
+LOG_DIR = BASE / "logs"
+RUNTIME_DIR = BASE / "runtime"
+
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
+
+LOG_FILE = LOG_DIR / "backup-guardian.log"
+LOCK_FILE = RUNTIME_DIR / "backup-guardian.lock"
+
+INTERVAL_SECONDS = 6 * 60 * 60
+
+
+def log(message):
+    timestamp = datetime.now(timezone.utc).isoformat()
+    with LOG_FILE.open("a", encoding="utf-8") as file:
+        file.write(f"[{timestamp}] {message}\n")
+        file.flush()
+
+
+def main():
+    os.chdir(BASE)
+
+    # Prevent two Guardian instances from running together.
+    lock = LOCK_FILE.open("w")
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        log("Another Guardian instance already holds the lock. Exiting.")
+        return
+
+    from backup_factory.engine import create_backup, verify_backup
+
+    log("Backup Guardian started.")
+    log("Automatic backup interval: 6 hours.")
+    log("Existing backups will not be automatically deleted.")
+
+    while True:
+        try:
+            # Wait six hours after startup before the first scheduled backup.
+            time.sleep(INTERVAL_SECONDS)
+
+            log("Scheduled backup starting.")
+
+            backup = create_backup()
+            filename = backup["filename"]
+
+            log(
+                f"Backup created: {filename}; "
+                f"files: {backup.get('files_count', 'unknown')}"
+            )
+
+            result = verify_backup(filename)
+
+            if result.get("verified") is True:
+                log(
+                    f"VERIFIED: {filename}; "
+                    f"SHA256: {result.get('sha256', 'not reported')}"
+                )
+            else:
+                log(f"VERIFICATION FAILED: {filename}")
+
+        except Exception:
+            log("BACKUP ERROR:\n" + traceback.format_exc())
+
+
+if __name__ == "__main__":
+    main()
+
+
+============================================================
+SUPERVISOR SOURCE
+============================================================
+#!/data/data/com.termux/files/usr/bin/bash
+
+cd "$HOME/PyForge" || exit 1
+
+mkdir -p logs runtime
+
+echo "Supervisor started: $(date)" >> logs/boot-server.log
+
+while true; do
+
+    if ! pgrep -f '[u]vicorn main:app' >/dev/null; then
+        echo "Starting API: $(date)" >> logs/boot-server.log
+
+        cd "$HOME/PyForge"
+        nohup python -m uvicorn main:app \
+            --host 0.0.0.0 \
+            --port 8001 \
+            >> logs/api-server.log 2>&1 &
+    fi
+
+    if ! pgrep -f '[p]ython -m http.server 8002' >/dev/null; then
+        echo "Starting dashboard: $(date)" >> logs/boot-server.log
+
+        cd "$HOME/PyForge/dashboard_v2"
+        nohup python -m http.server 8002 \
+            --bind 0.0.0.0 \
+            >> "$HOME/PyForge/logs/dashboard-server.log" 2>&1 &
+    fi
+
+    if ! pgrep -f '[b]ackup_guardian.py' >/dev/null; then
+        echo "Starting Backup Guardian: $(date)" >> "$HOME/PyForge/logs/boot-server.log"
+
+        cd "$HOME/PyForge"
+        nohup python runtime/backup_guardian.py \
+            >> logs/backup-guardian-process.log 2>&1 &
+    fi
+
+    sleep 15
+done
+
+
+============================================================
+logs/startup-manager.log
+============================================================
+FILE NOT FOUND
+
+============================================================
+logs/backup-guardian-process.log
+============================================================
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 76, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 76, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 76, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 76, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 76, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 76, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 76, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'
+
+
+============================================================
+logs/api-server.log
+============================================================
+INFO:     Started server process [5981]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+INFO:     127.0.0.1:52226 - "GET /api/auth/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52234 - "GET /api/projects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:47158 - "GET /api/auth/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47174 - "GET /api/projects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:42634 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42648 - "GET /api/auth/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42658 - "GET /api/projects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:39734 - "OPTIONS /api/projects HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:39736 - "OPTIONS /api/projects HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:39750 - "OPTIONS /api/console/projects HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:39764 - "GET /api/monitoring/summary HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:39772 - "GET /api/backups HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:39776 - "OPTIONS /api/console/projects HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:39776 - "OPTIONS /api/console/projects HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:39776 - "GET /api/monitoring/summary HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:39776 - "OPTIONS /api/console/projects HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:39776 - "OPTIONS /api/console/projects HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:53662 - "OPTIONS /api/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53668 - "OPTIONS /api/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53672 - "OPTIONS /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53676 - "GET /api/monitoring/summary HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:53688 - "GET /api/backups HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:53668 - "GET /api/console/projects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:53700 - "GET /api/projects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:53668 - "GET /api/projects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56922 - "OPTIONS /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56926 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56922 - "GET /api/projects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56938 - "GET /api/console/projects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56944 - "GET /api/projects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56922 - "GET /api/backups HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56952 - "GET /api/monitoring/summary HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56926 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56952 - "OPTIONS /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56926 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56926 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56926 - "GET /api/monitoring/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56926 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56952 - "OPTIONS /api/auth/logout HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56926 - "POST /api/auth/logout HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56952 - "GET /api/projects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:39218 - "GET /api/console/projects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:39224 - "GET /api/projects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:39224 - "GET /api/monitoring/summary HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:39218 - "GET /api/backups HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:39664 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:39670 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50506 - "GET /api/projects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50520 - "GET /api/console/projects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50528 - "GET /api/projects HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50534 - "GET /api/monitoring/summary HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50544 - "GET /api/backups HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:39670 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39670 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39670 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39670 - "GET /api/monitoring/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39670 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39670 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39670 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48616 - "GET /api/monitoring/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48616 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48616 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48616 - "GET /api/monitoring/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48616 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:48616 - "GET /api/c
+[TRUNCATED]
+
+============================================================
+STARTUP TEST RESULTS
+============================================================
+===================================
+ PYFORGE STARTUP MANAGER TEST SUITE
+===================================
+
+[PASS] Startup Manager backend exists
+[PASS] Dashboard JavaScript exists
+[PASS] Dashboard HTML exists
+[PASS] Backend Python syntax
+[PASS] Dashboard script connected
+[PASS] Dashboard feature: /api/startup/status
+[PASS] Dashboard feature: /api/startup/restart/api
+[PASS] Dashboard feature: /api/startup/restart/dashboard
+[PASS] Dashboard feature: /api/startup/wake-lock
+[PASS] Dashboard feature: setInterval
+[PASS] API responds HTTP 200
+       {"status":"online","platform":"PyForge Cloud","version":"1.0.0"}
+[FAIL] Startup Manager status endpoint
+       {"detail":"Authentication required or session expired."}
+[PASS] Dashboard responds HTTP 200
+[PASS] Unauthenticated API access is protected
+       HTTP 401
+
+===================================
+ TEST RESULTS
+===================================
+PASSED: 13
+FAILED: 1
+TOTAL:  14
+
+SOME TESTS NEED ATTENTION.
+===================================
+
+============================================================
+TOP LEVEL PROJECT INVENTORY
+============================================================
+./PYFORGE_HANDOFF.txt
+./PYFORGE_LATEST_REPORT.txt
+./__pycache__/main.cpython-314.pyc
+./backup_factory/engine.py
+./backups/index.html.before-live-capacity
+./backups/index.html.before-monitoring-20261115_164008
+./backups/index.html.before-monitoring-ui
+./backups/main.py.before-monitoring-20261115_164008
+./backups/process_manager.py.before-guardian
+./backups/pyforge-supervisor-before-guardian-20261116_112243.sh
+./backups/system_monitor.py.before-guardian
+./configuration/config.py
+./dashboard/app.js
+./dashboard/index.html
+./dashboard/style.css
+./dashboard/style.css.backup
+./dashboard_v2/index.html
+./dashboard_v2/index.html.before-button-contrast
+./dashboard_v2/index.html.before-button-fix
+./dashboard_v2/index.html.before-code-studio
+./dashboard_v2/index.html.before-console-runtime
+./dashboard_v2/index.html.before-download-button
+./dashboard_v2/index.html.before-files-workspace
+./dashboard_v2/index.html.before-live-logs
+./dashboard_v2/index.html.before_pyforge_manager
+./dashboard_v2/index.html.before_startup_dashboard
+./dashboard_v2/index.html.menu-fix-20261116_121853
+./dashboard_v2/index.html.phase2-backup
+./dashboard_v2/index.html.pre-auth-20261116_121336
+./dashboard_v2/startup-dashboard.js
+./dashboard_v2/startup-dashboard.js.backup
+./dashboard_v2/startup-dashboard.js.before_pyforge_manager
+./logs/api-server.log
+./logs/backup-guardian-process.log
+./logs/backup-guardian.log
+./logs/boot-server.log
+./main.py
+./main.py.before-code-studio
+./main.py.before-console-runtime
+./main.py.before-live-logs
+./main.py.before_startup_integration
+./main.py.phase2-backup
+./main.py.phase3-before-create-endpoints
+./main.py.syntax_error_backup
+./monitoring/system_monitor.py
+./projects/file_manager.py
+./projects/file_manager.py.phase3-backup
+./projects/project_manager.py
+./projects/project_manager.py.phase2-backup
+./repair_files_studio.py
+./runtime/backup-guardian.lock
+./runtime/backup_guardian.py
+./runtime/process_manager.py
+./runtime/process_manager.py.before-live-logs
+./runtime/pyforge-supervisor.sh
+./runtime/security.sqlite3
+./runtime/startup_manager.py
+./runtime/startup_manager.py.before_full_update
+./runtime/test_startup_manager.py
+./runtime/wake-lock-requested
+./security_core/__init__.py
+./security_core/auth.py
+./security_core/middleware.py
+./security_core/routes.py
+./test-console-download.log
+
+============================================================
+GIT STATUS
+============================================================

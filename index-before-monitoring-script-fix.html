@@ -1,0 +1,2178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#020817">
+<title>PyForge Cloud</title>
+<style>
+:root{
+  --bg:#020817;--panel:#06152d;--panel2:#081d3a;--blue:#00aaff;
+  --cyan:#00e5ff;--purple:#873cff;--green:#00f58a;--gold:#ffd21f;
+  --white:#eef8ff;--muted:#9ab8d8;--line:rgba(0,174,255,.55);
+  --glow:0 0 9px rgba(0,174,255,.85),0 0 24px rgba(0,116,255,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--white);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+body{
+ background:
+ radial-gradient(ellipse at 48% 28%,rgba(0,108,255,.18),transparent 40%),
+ radial-gradient(ellipse at 95% 70%,rgba(91,0,255,.13),transparent 35%),
+ linear-gradient(155deg,#010611,#06152c 52%,#020716);
+ overflow-x:hidden
+}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.18;background-image:linear-gradient(rgba(0,174,255,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(0,174,255,.1) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(to bottom,black,transparent 85%)}
+button{font:inherit;color:inherit}
+.app{max-width:520px;min-height:100svh;margin:auto;position:relative;padding-bottom:84px;isolation:isolate}
+.top-status{height:30px;padding:5px 18px;display:flex;justify-content:space-between;font-size:12px;color:#e6f4ff;letter-spacing:.4px}
+.header{position:relative;display:flex;align-items:center;gap:10px;padding:14px 15px 13px;border-bottom:1px solid rgba(0,174,255,.45);background:linear-gradient(180deg,rgba(0,18,44,.96),rgba(2,10,26,.84));box-shadow:0 5px 24px rgba(0,120,255,.13)}
+.logo-mark{width:70px;height:70px;flex:0 0 70px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 35% 25%,#244b70 0%,#071a35 58%,#010713 100%);border:5px ridge #a9c8df;box-shadow:inset 0 0 13px #00aaff,0 0 8px #b7e8ff,0 0 20px #007dff;position:relative}
+.logo-mark svg{width:56px;height:56px;filter:drop-shadow(0 0 5px rgba(0,174,255,.7))}
+.brand h1{background:linear-gradient(180deg,#ffffff 0%,#dce7ef 17%,#8999a9 34%,#f8ffff 48%,#718294 63%,#e9f1f7 78%,#536477 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:.35px #eaf7ff;text-shadow:0 1px 0 #53677b,0 2px 0 #182d43,0 0 12px rgba(0,145,255,.6);filter:drop-shadow(0 3px 2px rgba(0,0,0,.9))}
+.brand h1 span{background:linear-gradient(180deg,#ffffff 0%,#d9e4ec 20%,#71899d 42%,#f7ffff 55%,#60768a 78%,#e4edf4 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:.3px #d9efff;text-shadow:0 0 12px rgba(0,166,255,.65)}
+.brand{min-width:0;flex:1}
+.brand h1{font-size:clamp(25px,7vw,36px);line-height:.9;margin:0;font-weight:900;font-style:italic;letter-spacing:-1.5px;text-shadow:0 0 12px #168cff}
+.brand h1 span{display:block;color:#00cfff;font-size:.72em;letter-spacing:7px;text-align:center;margin-top:6px}
+.tagline{font-size:9px;letter-spacing:1.2px;color:#c8eaff;margin-top:7px;white-space:nowrap}
+.owner{display:flex;align-items:center;gap:6px;font-size:11px;white-space:nowrap}
+.online-dot{width:9px;height:9px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 10px var(--green)}
+.menu-button{width:47px;height:47px;border:2px solid var(--cyan);border-radius:13px;background:linear-gradient(145deg,#082d58,#020b1c);box-shadow:var(--glow);font-size:26px;cursor:pointer;flex:0 0 auto}
+.hero{position:relative;min-height:235px;padding:22px 18px 18px;overflow:hidden;border-bottom:1px solid rgba(0,174,255,.5);background:
+ radial-gradient(circle at 65% 48%,rgba(0,149,255,.55),transparent 23%),
+ radial-gradient(circle at 66% 47%,rgba(0,52,115,.95) 0 16%,transparent 17%),
+ linear-gradient(90deg,rgba(1,8,22,.96),rgba(1,16,42,.65) 58%,rgba(0,9,25,.92)),
+ repeating-linear-gradient(90deg,transparent 0 18px,rgba(0,156,255,.14) 19px 21px);
+}
+.hero:before{content:"";position:absolute;width:185px;height:185px;right:7%;top:10px;border-radius:50%;border:2px solid rgba(0,183,255,.75);box-shadow:0 0 22px #008cff,inset 0 0 30px #006aff;background:radial-gradient(circle at 35% 30%,#1b72a8,#05234d 55%,#010b20 72%);opacity:.88}
+.hero:after{content:"";position:absolute;right:12%;top:30px;width:150px;height:150px;border-radius:50%;background:repeating-linear-gradient(0deg,transparent 0 13px,rgba(0,201,255,.18) 14px 15px),repeating-linear-gradient(90deg,transparent 0 17px,rgba(0,201,255,.16) 18px 19px);clip-path:circle(50%)}
+.hero-python{position:absolute;z-index:1;right:22%;top:60px;font-size:68px;font-weight:900;color:#ffd52a;text-shadow:0 0 15px #00aaff}
+.hero-copy{position:relative;z-index:2;max-width:72%;padding-top:90px}
+.hero-copy small{font-size:10px;letter-spacing:2px;color:#9edfff}
+.hero-copy h2{font-size:30px;line-height:1.02;margin:7px 0;color:#f1f9ff;text-shadow:0 0 12px #007dff}
+.hero-copy h2 span{display:block;color:#00d7ff;font-size:1.13em}
+.hero-copy p{font-size:13px;line-height:1.35;color:#c8eaff;margin:8px 0 0}
+.section-ribbon{margin:13px 15px 12px;padding:12px 14px;border:2px solid #009dff;border-radius:15px;background:linear-gradient(110deg,#061a36,#0b2b54 48%,#041329);box-shadow:var(--glow),inset 0 0 14px rgba(0,174,255,.2);text-align:center;font-weight:800;letter-spacing:.7px}
+.metrics{display:grid;gap:10px;padding:0 15px}
+.metric{min-height:73px;display:flex;align-items:center;gap:13px;padding:11px 14px;border:2px solid #087ed4;border-radius:14px;background:linear-gradient(110deg,rgba(4,23,50,.98),rgba(7,31,65,.92));box-shadow:0 0 12px rgba(0,137,255,.25),inset 0 0 16px rgba(0,174,255,.08);position:relative;overflow:hidden}
+.metric:after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.04),transparent 62%);pointer-events:none}
+.metric-icon{width:48px;text-align:center;font-size:28px;color:#00cfff;text-shadow:0 0 12px #008dff}
+.metric-copy{flex:1}
+.metric-copy small{display:block;color:#d7edff;font-size:12px}
+.metric-copy strong{font-size:21px;line-height:1.2}
+.metric-status{color:var(--green);font-weight:800}
+.system-footer{margin:13px 15px 15px;padding:13px;border:2px solid #008dff;border-radius:15px;background:linear-gradient(120deg,#071b39,#020b1d);box-shadow:var(--glow);text-align:center}
+.system-footer strong{display:block;color:var(--gold);font-size:12px}
+.system-footer em{display:block;margin-top:5px;font-size:14px;font-style:italic}
+.drawer-backdrop{position:fixed;inset:0;background:rgba(0,3,12,.62);z-index:10;opacity:0;pointer-events:none;transition:.25s}
+.drawer{position:fixed;z-index:11;right:0;top:0;bottom:0;width:min(82vw,360px);padding:22px 13px 18px;background:linear-gradient(160deg,#061a37 0%,#020817 70%);border-left:2px solid #008dff;box-shadow:-10px 0 35px rgba(0,126,255,.35);transform:translateX(105%);transition:transform .25s ease;overflow-y:auto}
+.drawer.open{transform:translateX(0)}
+.drawer-backdrop.show{opacity:1;pointer-events:auto}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 15px;border-bottom:1px solid rgba(0,174,255,.45);margin-bottom:9px}
+.drawer-head strong{font-size:17px;letter-spacing:1px}
+.close-button{border:1px solid #00baff;background:#061a37;border-radius:9px;padding:5px 10px;font-size:20px}
+.nav-list{display:grid;gap:4px}
+.nav-item{width:100%;display:flex;align-items:center;gap:13px;text-align:left;padding:12px 10px;border:1px solid transparent;border-bottom-color:rgba(0,160,255,.25);border-radius:10px;background:transparent;cursor:pointer;font-size:14px}
+.nav-item .nav-icon{width:30px;text-align:center;font-size:21px;color:#00caff;text-shadow:0 0 9px #008cff}
+.nav-item.active{border:1px solid #00baff;background:linear-gradient(100deg,#082d59,#07172e);box-shadow:var(--glow)}
+.drawer-foot{margin-top:18px;padding:13px 8px;border:1px solid #087ed4;border-radius:12px;text-align:center;background:#04152d;font-size:11px;line-height:1.7}
+.drawer-foot strong{display:block;color:var(--gold);letter-spacing:1px}
+.drawer-foot span{display:block;color:#d7edff}
+.page{display:none;min-height:65vh;padding:22px 17px}
+.page.active{display:block}
+.page h2{margin:0 0 8px;font-size:25px;text-shadow:0 0 12px #007dff}
+.page p{color:#b8d8f4;font-size:14px;line-height:1.5}
+.page-panel{padding:17px;margin-top:15px;border:1px solid #087ed4;border-radius:14px;background:linear-gradient(140deg,#071c3a,#020b1d);box-shadow:var(--glow)}
+.bottom-nav{position:fixed;z-index:5;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,520px);display:grid;grid-template-columns:repeat(4,1fr);padding:9px 5px calc(9px + env(safe-area-inset-bottom));background:rgba(2,12,29,.96);border:1px solid #087ed4;border-radius:15px 15px 0 0;box-shadow:0 -5px 22px rgba(0,126,255,.2);backdrop-filter:blur(12px)}
+.bottom-nav button{border:0;border-right:1px solid rgba(0,174,255,.35);background:transparent;color:#cde9ff;font-size:10px;padding:5px 1px;cursor:pointer}
+.bottom-nav button:last-child{border:0}
+.bottom-nav b{display:block;font-size:20px;color:#00caff;margin-bottom:2px}
+@media(min-width:600px){.app{border-left:1px solid #12395e;border-right:1px solid #12395e}.drawer{right:max(0px,calc((100vw - 520px)/2))}}
+
+
+.earth-visual{
+ position:absolute;z-index:1;right:5%;top:3px;width:205px;height:205px;
+ filter:drop-shadow(0 0 3px rgba(188,244,255,.95)) drop-shadow(0 0 13px rgba(0,145,255,.85)) drop-shadow(0 13px 15px rgba(0,0,0,.95));
+}
+.earth-visual:after{
+ content:"";position:absolute;inset:4%;border-radius:50%;pointer-events:none;
+ box-shadow:inset -17px -7px 25px rgba(0,0,0,.72),inset 8px 5px 14px rgba(215,250,255,.18),0 0 7px rgba(123,224,255,.45);
+}
+.earth-visual svg{width:100%;height:100%;overflow:visible}
+.hero-python{display:none}
+
+/* ===== 3D FORGED MATERIAL UPGRADE ===== */
+:root{
+ --steel-hi:#f4fbff;--steel-mid:#9bb4c9;--steel-low:#263c55;
+ --edge-blue:#38caff;--deep-shadow:#00030a;
+}
+body{
+ background:
+ radial-gradient(ellipse at 50% 26%,rgba(0,119,255,.25),transparent 36%),
+ radial-gradient(ellipse at 50% 82%,rgba(0,35,105,.35),transparent 50%),
+ repeating-linear-gradient(118deg,rgba(255,255,255,.012) 0 1px,transparent 1px 4px),
+ linear-gradient(145deg,#00030a 0%,#06142b 48%,#00040d 100%);
+}
+.header{
+ border-bottom:2px solid #1c9dff;
+ box-shadow:0 5px 0 rgba(0,0,0,.8),0 9px 24px rgba(0,133,255,.28),inset 0 1px 0 rgba(255,255,255,.2);
+}
+.logo-mark{
+ border:5px solid transparent;
+ background:
+ linear-gradient(145deg,#07172c,#020711) padding-box,
+ linear-gradient(135deg,#fff,#42617d 18%,#d8efff 31%,#405a76 48%,#eaf8ff 63%,#263e59 82%,#b8d9ef) border-box;
+ box-shadow:inset 0 5px 9px rgba(255,255,255,.22),inset 0 -9px 13px #000,0 5px 0 #152a42,0 8px 14px #000,0 0 19px #008cff;
+}
+.brand h1{
+ letter-spacing:-1.7px;
+ background:linear-gradient(180deg,#fff 0%,#e6f1fa 13%,#8299ae 27%,#faffff 40%,#526b83 53%,#e9f6ff 67%,#71869b 82%,#fff 100%);
+ -webkit-background-clip:text;background-clip:text;color:transparent;
+ -webkit-text-stroke:.6px #e9f7ff;
+ filter:drop-shadow(0 2px 0 #30465d) drop-shadow(0 5px 2px #000) drop-shadow(0 0 9px #008cff);
+}
+.brand h1 span{
+ background:linear-gradient(180deg,#fff 0%,#9db8cf 19%,#f7ffff 33%,#59758f 50%,#eaf8ff 66%,#7f9ab1 82%,#fff 100%);
+ -webkit-background-clip:text;background-clip:text;color:transparent;
+ -webkit-text-stroke:.7px #d9f1ff;
+ filter:drop-shadow(0 2px 0 #18334f) drop-shadow(0 0 9px #00aaff);
+}
+.menu-button,.metric,.section-ribbon,.system-footer,.page-panel{
+ position:relative;
+ transform:translateZ(0);
+ border-style:solid;
+ border-width:2px;
+ border-color:#71d9ff #0874c9 #034b91 #55caff;
+ box-shadow:
+  inset 0 2px 1px rgba(255,255,255,.48),
+  inset 0 -5px 8px rgba(0,0,0,.72),
+  inset 2px 0 4px rgba(0,194,255,.28),
+  0 2px 0 #001226,
+  0 5px 0 #03152c,
+  0 8px 14px rgba(0,0,0,.85),
+  0 0 9px rgba(0,155,255,.9),
+  0 0 23px rgba(0,112,255,.32);
+}
+.menu-button{
+ background:linear-gradient(155deg,#174a79 0%,#071b35 34%,#020713 65%,#0b2b4e 100%);
+ border-radius:14px;
+ text-shadow:0 2px 2px #000;
+}
+.metric{
+ background:
+ linear-gradient(110deg,rgba(255,255,255,.09),transparent 22%,rgba(0,0,0,.2) 70%),
+ linear-gradient(180deg,#123b62 0%,#071b35 19%,#020a18 55%,#0a2748 100%);
+ border-radius:17px;
+}
+.metric:before,.section-ribbon:before,.system-footer:before,.page-panel:before{
+ content:"";position:absolute;inset:3px;border-radius:inherit;pointer-events:none;
+ border:1px solid rgba(199,239,255,.18);
+ box-shadow:inset 0 1px 3px rgba(255,255,255,.16),inset 0 -2px 4px rgba(0,0,0,.8);
+}
+.metric:after{
+ content:"";position:absolute;inset:0;pointer-events:none;
+ background:linear-gradient(112deg,rgba(255,255,255,.14),transparent 13%,transparent 64%,rgba(0,169,255,.09));
+}
+.metric-icon{
+ filter:drop-shadow(0 2px 1px #000) drop-shadow(0 0 8px #00aaff);
+}
+.metric-copy strong{
+ text-shadow:0 2px 2px #000,0 0 8px rgba(0,174,255,.35);
+}
+.section-ribbon{
+ border-radius:15px;
+ background:linear-gradient(180deg,#164a77 0%,#0a2748 16%,#020b1a 52%,#0a2c50 100%);
+ text-shadow:0 2px 2px #000,0 0 8px #008cff;
+}
+.system-footer{
+ border-radius:16px;
+ background:linear-gradient(180deg,#15436b,#071a32 35%,#020814 68%,#0b2b4b);
+}
+.hero{
+ border-top:1px solid rgba(255,255,255,.2);
+ border-bottom:3px solid #0068b8;
+ box-shadow:inset 0 10px 24px rgba(0,0,0,.65),inset 0 -12px 22px rgba(0,0,0,.65),0 7px 15px #000;
+}
+.hero:before{
+ border:3px solid #75e4ff;
+ box-shadow:0 0 0 4px #064b9a,0 0 0 7px rgba(0,194,255,.55),0 0 28px #00aaff,inset 0 0 35px #008cff,inset 0 -18px 22px #000;
+ background:
+ radial-gradient(ellipse at 32% 25%,rgba(112,224,255,.9),transparent 8%),
+ radial-gradient(circle at 40% 35%,#1d6ba7,#052044 56%,#010817 75%);
+}
+.hero-python{
+ color:#ffda37;
+ -webkit-text-stroke:2px #f6f1ba;
+ filter:drop-shadow(0 4px 0 #855300) drop-shadow(0 8px 2px #000) drop-shadow(0 0 13px #00aaff);
+}
+.drawer{
+ background:
+ repeating-linear-gradient(105deg,rgba(255,255,255,.018) 0 1px,transparent 1px 5px),
+ linear-gradient(145deg,#12375c 0%,#06172e 18%,#010713 72%,#08294a 100%);
+ border-left:3px solid #54d9ff;
+ box-shadow:inset 7px 0 15px rgba(0,0,0,.75),-8px 0 0 #00132a,-12px 0 24px rgba(0,136,255,.55);
+}
+.nav-item{
+ border-bottom:1px solid rgba(56,177,255,.38);
+ text-shadow:0 2px 2px #000;
+}
+.nav-item.active{
+ border:2px solid #6ce2ff;
+ background:linear-gradient(180deg,#1b5b91 0%,#0b2b51 22%,#031126 72%,#0d3a65 100%);
+ box-shadow:inset 0 2px 2px rgba(255,255,255,.45),inset 0 -5px 8px #000,0 3px 0 #00152c,0 6px 12px #000,0 0 12px #00aaff;
+}
+.nav-icon{
+ filter:drop-shadow(0 2px 1px #000) drop-shadow(0 0 7px #00aaff);
+}
+.drawer-foot{
+ background:linear-gradient(180deg,#17466e,#06172e 38%,#020814 72%,#0b2a49);
+ border:2px solid #168de0;
+ box-shadow:inset 0 2px 3px rgba(255,255,255,.25),inset 0 -5px 8px #000,0 4px 0 #00142a,0 7px 13px #000,0 0 12px #008cff;
+}
+.bottom-nav{
+ border:2px solid #42cfff;
+ background:linear-gradient(180deg,#16436b 0%,#06172e 28%,#010713 100%);
+ box-shadow:inset 0 2px 3px rgba(255,255,255,.25),0 -4px 0 #00162d,0 -7px 18px #000,0 0 15px #008cff;
+}
+.bottom-nav b{filter:drop-shadow(0 2px 1px #000) drop-shadow(0 0 8px #00aaff)}
+button:active{transform:translateY(2px);filter:brightness(1.2)}
+
+
+/* PYFORGE PROJECT MANAGER BUTTON FIX */
+#page-projects #project-refresh,
+#page-projects #project-create,
+#page-projects button[data-action] {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 44px !important;
+  padding: 10px 16px !important;
+  border: 1px solid #35caff !important;
+  border-radius: 10px !important;
+  background: linear-gradient(145deg,#07549a,#062344) !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  cursor: pointer !important;
+}
+#page-projects #project-refresh {
+  background: linear-gradient(145deg,#16466b,#09213c) !important;
+}
+#page-projects #project-create {
+  background: linear-gradient(145deg,#087d75,#064b58) !important;
+}
+#page-projects #project-list,
+#page-projects #project-count,
+#page-projects #project-message {
+  color: #e8f5ff !important;
+}
+
+
+/* PYFORGE_BUTTON_CONTRAST_V2 */
+
+/* Readable controls on Projects and Files */
+#page-projects button,
+#page-files button {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 14px !important;
+  text-shadow: 0 1px 2px #000 !important;
+  border: 2px solid #39caff !important;
+  border-radius: 10px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+/* Projects controls */
+#page-projects #project-refresh,
+#page-files #files-refresh,
+#page-files #files-up {
+  background: linear-gradient(145deg,#0878bd,#07345d) !important;
+}
+
+#page-projects #project-create,
+#page-files #files-new-folder,
+#page-files #files-new-file {
+  background: linear-gradient(145deg,#087d75,#064b48) !important;
+}
+
+/* Project actions */
+#page-projects button[data-action="open"] {
+  background: linear-gradient(145deg,#0878bd,#07345d) !important;
+}
+
+#page-projects button[data-action="details"] {
+  background: linear-gradient(145deg,#6842a8,#35205f) !important;
+}
+
+#page-projects button[data-action="rename"] {
+  background: linear-gradient(145deg,#93600a,#573700) !important;
+}
+
+#page-projects button[data-action="delete"] {
+  background: linear-gradient(145deg,#a52c3b,#601522) !important;
+}
+
+/* Files workspace actions */
+#page-files #files-back-projects,
+#page-files #files-close-editor {
+  background: linear-gradient(145deg,#354e69,#172b43) !important;
+}
+
+#page-files #files-save {
+  background: linear-gradient(145deg,#07965e,#075335) !important;
+  border-color: #59f0ad !important;
+}
+
+/* File and folder rows */
+#page-files #files-list button {
+  display: block !important;
+  width: 100% !important;
+  min-height: 48px !important;
+  padding: 12px !important;
+  text-align: left !important;
+  background: linear-gradient(145deg,#123b60,#071c32) !important;
+  color: #ffffff !important;
+  border: 2px solid #269cdb !important;
+  white-space: normal !important;
+}
+
+/* Readable project and file information */
+#page-projects #project-list,
+#page-projects #project-count,
+#page-projects #project-message,
+#page-files,
+#page-files #files-status,
+#page-files #files-path,
+#page-files #files-editor-title {
+  color: #f0f7ff !important;
+}
+
+#page-projects button:hover,
+#page-files button:hover {
+  filter: brightness(1.3) !important;
+}
+
+
+/* PYFORGE_CONSOLE_LIVE_LOGS_V2 */
+#console-output {
+  min-height: 180px;
+  max-height: 480px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 12px;
+  background: #050d17;
+  color: #b8e7d0;
+  border: 1px solid #29435b;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.console-log-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+#console-download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 38px;
+  box-sizing: border-box;
+  color: #55e6a5;
+  background: #102a27;
+  font-size: 23px;
+  font-weight: 900;
+  text-decoration: none;
+  border: 1px solid #20c98a;
+  border-radius: 9px;
+  cursor: pointer;
+}
+#console-download:active {
+  background: #174638;
+  transform: scale(0.96);
+}
+
+/* PYFORGE MULTI-BOT CONSOLE V3 */
+.console-copy-button {
+  padding:10px 15px;
+  border:1px solid #315675;
+  border-radius:8px;
+  background:#102b43;
+  color:#55e6a5;
+  cursor:pointer;
+}
+.console-copy-button:disabled {
+  opacity:.5;
+  cursor:wait;
+}
+
+.console-list-heading,.console-history-heading {
+  display:flex;justify-content:space-between;align-items:center;
+  gap:12px;flex-wrap:wrap;margin-bottom:16px
+}
+.console-project-cards {
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:14px;margin-top:16px
+}
+.console-project-card {
+  display:flex;flex-direction:column;justify-content:space-between;gap:18px;
+  padding:16px;background:#0a1725;border:1px solid #29435b;
+  border-radius:12px;min-height:130px
+}
+.console-card-details {display:flex;flex-direction:column;gap:8px;overflow-wrap:anywhere}
+.console-card-status {color:#55e6a5;font-size:13px}
+.console-project-card button,#console-back,#console-refresh-projects,
+#console-refresh-history {
+  padding:10px 14px;border:1px solid #315675;border-radius:8px;
+  background:#102b43;color:#d9efff;cursor:pointer
+}
+.console-history-item {
+  display:flex;flex-direction:column;gap:7px;padding:12px;
+  margin:8px 0;background:#0a1725;border:1px solid #29435b;
+  border-radius:8px;overflow-wrap:anywhere
+}
+.console-history-item small {color:#9dc8e8}
+.console-history-item a {color:#55e6a5}
+#console-start:disabled,#console-restart:disabled,#console-end:disabled {
+  opacity:.4;cursor:not-allowed
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="logo-mark" aria-label="PyForge Python gear emblem">
+      <svg viewBox="0 0 100 100" role="img" aria-hidden="true">
+        <defs>
+          <linearGradient id="gearMetal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset=".28" stop-color="#91a9bd"/><stop offset=".52" stop-color="#e9f5ff"/><stop offset=".76" stop-color="#536e89"/><stop offset="1" stop-color="#d9e9f5"/></linearGradient>
+          <linearGradient id="pyBlue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7ce5ff"/><stop offset=".35" stop-color="#168bfa"/><stop offset="1" stop-color="#06439e"/></linearGradient>
+          <linearGradient id="pyGold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff27a"/><stop offset=".4" stop-color="#ffc928"/><stop offset="1" stop-color="#c87900"/></linearGradient>
+        </defs>
+        <circle cx="50" cy="50" r="45" fill="none" stroke="url(#gearMetal)" stroke-width="8"/>
+        <circle cx="50" cy="50" r="37" fill="#06172d" stroke="#1caeff" stroke-width="1.8"/>
+        <path d="M48 17h14c11 0 17 6 17 17v12H43c-7 0-12 5-12 12V65H20V36c0-12 7-19 19-19h9v-6h13v6z" fill="url(#pyBlue)" stroke="#8ceaff" stroke-width="1.5"/>
+        <circle cx="62" cy="29" r="3.2" fill="#06172d"/>
+        <path d="M52 83H38c-11 0-17-6-17-17V54h36c7 0 12-5 12-12V35h11v29c0 12-7 19-19 19h-9v6H39v-6z" fill="url(#pyGold)" stroke="#fff0a0" stroke-width="1.5"/>
+        <circle cx="38" cy="71" r="3.2" fill="#493000"/>
+      </svg>
+    </div>
+    <div class="brand">
+      <h1>PyForge <span>CLOUD</span></h1>
+      <div class="tagline">CODE • BUILD • DEPLOY • GROW</div>
+    </div>
+    <button class="menu-button" id="menuButton" aria-label="Open menu">☰</button>
+  </header>
+
+  <main>
+    <section class="page active" id="page-dashboard">
+      <div class="hero">
+        <div class="earth-visual" aria-label="Illustrated three-dimensional Earth globe">
+          <svg viewBox="0 0 240 240" role="img" aria-hidden="true">
+            <defs>
+              <radialGradient id="ocean" cx="29%" cy="23%" r="78%">
+                <stop offset="0" stop-color="#8cecff"/>
+                <stop offset=".12" stop-color="#247fbd"/>
+                <stop offset=".38" stop-color="#075b9b"/>
+                <stop offset=".68" stop-color="#04345f"/>
+                <stop offset=".9" stop-color="#01182f"/>
+                <stop offset="1" stop-color="#000711"/>
+              </radialGradient>
+              <linearGradient id="land" x1="0" y1="0" x2="1" y2="1">
+                <stop stop-color="#c5e6a0"/><stop offset=".38" stop-color="#579b68"/><stop offset=".72" stop-color="#286b57"/><stop offset="1" stop-color="#123c42"/>
+              </linearGradient>
+              <radialGradient id="shade" cx="28%" cy="22%" r="85%">
+                <stop offset=".35" stop-color="#fff" stop-opacity="0"/>
+                <stop offset=".76" stop-color="#001326" stop-opacity=".12"/>
+                <stop offset="1" stop-color="#00030b" stop-opacity=".9"/>
+              </radialGradient>
+              <clipPath id="earthClip"><circle cx="120" cy="120" r="96"/></clipPath>
+              <filter id="earthGlow"><feGaussianBlur stdDeviation="5"/></filter>
+            </defs>
+            <circle cx="120" cy="120" r="105" fill="#00baff" opacity=".22" filter="url(#earthGlow)"/>
+            <circle cx="120" cy="120" r="99" fill="url(#ocean)" stroke="#8cecff" stroke-width="2.5"/>
+            <g clip-path="url(#earthClip)">
+              <path d="M31 66l12-18 21-8 10 9 19-5 14 11-5 14-15 5-8 16-16 5-7 17-14-4-7-18-14-7z" fill="url(#land)" stroke="#b7e8a4" stroke-width="1.2"/>
+              <path d="M78 111l17 2 13 14-3 19-10 14-4 23-12 13-9-17 2-19-9-17 3-20z" fill="url(#land)" stroke="#b7e8a4" stroke-width="1.2"/>
+              <path d="M117 55l14-11 20 5 8 12 20 3 8 16-9 13-19-4-11 10-15-7-13 8-12-13 8-13z" fill="url(#land)" stroke="#b7e8a4" stroke-width="1.2"/>
+              <path d="M133 105l18-8 19 9 10 21-7 23-13 17-8 24-15-8-5-23-12-17 3-20z" fill="url(#land)" stroke="#b7e8a4" stroke-width="1.2"/>
+              <path d="M186 169l12-5 13 8-4 13-17 5-9-8z" fill="url(#land)" stroke="#b7e8a4" stroke-width="1"/>
+              <path d="M20 117Q120 82 220 117M20 147Q120 112 220 147M38 48Q120 120 38 192M202 48Q120 120 202 192" fill="none" stroke="#70dfff" stroke-opacity=".23" stroke-width="1.2"/>
+              <g fill="none" stroke="#e8fbff" stroke-linecap="round">
+                <path d="M30 82Q48 72 61 79T91 76M110 48Q132 39 149 49T178 53M85 137Q105 128 121 135T151 131M130 174Q149 164 167 173T190 169" stroke-opacity=".32" stroke-width="3"/>
+                <path d="M43 95Q58 89 71 94M146 91Q164 84 178 92M62 157Q77 150 91 156" stroke-opacity=".2" stroke-width="2"/>
+              </g>
+              <ellipse cx="83" cy="57" rx="35" ry="17" fill="#fff" opacity=".07" transform="rotate(-28 83 57)"/>
+              <circle cx="120" cy="120" r="96" fill="url(#shade)"/>
+              <path d="M45 54Q100 8 162 35" fill="none" stroke="#efffff" stroke-opacity=".85" stroke-width="3"/>
+            </g>
+            <circle cx="120" cy="120" r="99" fill="none" stroke="#75eaff" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="hero-copy">
+          <small>YOUR PRIVATE DEVELOPMENT WORKSPACE</small>
+          <h2>Welcome Back,<span>Developer!</span></h2>
+          <p>Your PyForge Cloud environment is ready.</p>
+        </div>
+      </div>
+      <div class="section-ribbon">▥ &nbsp; SYSTEM OVERVIEW
+      </div>
+      <div class="metrics">
+        <article class="metric"><div class="metric-icon">▦</div><div class="metric-copy"><small>CPU Usage</small><strong id="cpu-value">Checking…</strong></div></article>
+        <article class="metric"><div class="metric-icon">▤</div><div class="metric-copy"><small>RAM Usage</small><strong id="ram-value">Checking…</strong></div></article>
+        <article class="metric"><div class="metric-icon">▤</div><div class="metric-copy"><small>Storage</small><strong id="storage-value">Checking…</strong></div></article>
+        <article class="metric"><div class="metric-icon">▥</div><div class="metric-copy"><small>Server Status</small><strong class="metric-status" id="server-value">Checking…</strong></div></article>
+      </div>
+      <div class="system-footer"><strong>♛ &nbsp; MOKHOTHU FINANCES (PTY) LTD</strong><em>FORGED BY VISION • POWERED BY INNOVATION</em></div>
+    </section>
+
+    
+<section class="page" id="page-projects">
+  <h2>Projects</h2>
+  <p>Your Python projects and workspaces.</p>
+
+  <div class="page-panel" style="padding:18px">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+      <div>
+        <strong>Project Workspace</strong>
+        <div id="project-count" style="font-size:13px;opacity:.7;margin-top:5px">Loading projects...</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="project-refresh" type="button">↻ Refresh</button>
+        <button id="project-create" type="button">＋ New Project</button>
+      </div>
+    </div>
+
+    <div id="project-message" role="status" style="margin:14px 0;font-size:13px"></div>
+    <div id="project-list" style="display:grid;gap:10px">
+      Loading...
+    </div>
+    <div id="project-details" style="margin-top:18px"></div>
+  </div>
+</section>
+
+    
+<section class="page" id="page-files">
+  <h2>PyForge Files Studio</h2>
+  <p>Manage projects, browse files, edit code and download your work.</p>
+
+  <div class="page-panel" style="padding:16px">
+
+    <div id="files-project-picker">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <div>
+          <strong>YOUR PROJECTS</strong>
+          <div id="files-project-count" style="font-size:12px;margin-top:5px">Loading projects...</div>
+        </div>
+        <button type="button" id="files-project-refresh">↻ Refresh</button>
+      </div>
+      <div id="files-project-list" style="display:grid;gap:10px;margin-top:14px">
+        Loading projects...
+      </div>
+    </div>
+
+    <div id="files-workspace" hidden>
+      <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+        <div>
+          <strong id="files-project-name">No project selected</strong>
+          <div id="files-status" role="status" style="font-size:12px;margin-top:5px">Select a project to begin.</div>
+        </div>
+        <button type="button" id="files-back-projects">← All Projects</button>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:15px">
+        <button type="button" id="files-up">↑ Up</button>
+        <button type="button" id="files-refresh">↻ Refresh</button>
+        <button type="button" id="files-new-folder">＋ New Folder</button>
+        <button type="button" id="files-new-file">＋ New File</button>
+        <button type="button" id="files-download-zip">↓ Download Project ZIP</button>
+      </div>
+
+      <div id="files-path" style="font-size:12px;opacity:.75;margin:13px 0">/</div>
+
+      <div style="border:1px solid #42617a;border-radius:10px;padding:12px;min-height:90px">
+        <strong>Project Files</strong>
+        <div id="files-list" style="display:grid;gap:8px;margin-top:12px">
+          Select a project to browse its files.
+        </div>
+      </div>
+
+      <div id="files-editor-panel" style="margin-top:16px;border:1px solid #42617a;border-radius:10px;padding:12px">
+        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap">
+          <strong id="files-editor-title">File Editor</strong>
+          <div style="display:flex;gap:8px">
+            <button type="button" id="files-close-editor">Close</button>
+            <button type="button" id="files-save">Save File</button>
+          </div>
+        </div>
+
+        <p style="font-size:12px;opacity:.7">
+          Text editor for Python, JSON, TXT, Markdown, YAML, HTML, CSS and JavaScript.
+          Line numbers stay visible while editing. Treat .env files as sensitive.
+        </p>
+
+        <div class="files-code-editor">
+          <div id="files-line-numbers" aria-hidden="true">1</div>
+          <textarea id="files-editor" spellcheck="false" disabled
+            placeholder="Select a file to open it..."
+            wrap="off"></textarea>
+        </div>
+        <div id="files-editor-state" style="font-size:12px;margin-top:8px;opacity:.8">No file open.</div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    #page-files .files-code-editor {
+      display:grid;
+      grid-template-columns:48px minmax(0,1fr);
+      height:420px;
+      margin-top:10px;
+      overflow:hidden;
+      border:1px solid #42617a;
+      border-radius:8px;
+      background:#071321;
+    }
+    #page-files #files-line-numbers {
+      overflow:hidden;
+      padding:12px 9px;
+      background:#0c1b2b;
+      color:#7294b2;
+      text-align:right;
+      white-space:pre;
+      font:13px/1.5 monospace;
+      user-select:none;
+      border-right:1px solid #29435b;
+    }
+    #page-files #files-editor {
+      display:block;
+      width:100%;
+      height:100%;
+      min-width:0;
+      box-sizing:border-box;
+      margin:0;
+      padding:12px;
+      resize:none;
+      overflow:auto;
+      background:#071321;
+      color:#d9efff;
+      border:0;
+      outline:none;
+      font:13px/1.5 monospace;
+      tab-size:4;
+      white-space:pre;
+    }
+    #page-files .files-entry {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      position:relative;
+      min-width:0;
+      padding:7px;
+      border:1px solid #315575;
+      border-radius:9px;
+      background:#10243a;
+    }
+    #page-files .files-entry-open {
+      flex:1;
+      min-width:0;
+      text-align:left;
+      overflow-wrap:anywhere;
+      background:transparent !important;
+      border:0 !important;
+      box-shadow:none;
+    }
+    #page-files .files-menu {
+      position:relative;
+      flex:0 0 auto;
+    }
+    #page-files .files-menu-panel {
+      position:absolute;
+      z-index:50;
+      right:0;
+      top:42px;
+      width:190px;
+      padding:6px;
+      display:none;
+      background:#0b1b2c;
+      border:1px solid #39a9df;
+      border-radius:9px;
+      box-shadow:0 8px 24px #0009;
+    }
+    #page-files .files-menu-panel.open { display:grid;gap:4px; }
+    #page-files .files-menu-panel button {
+      min-height:36px;
+      padding:8px;
+      text-align:left;
+      background:#17334d;
+      border:1px solid #315575;
+      border-radius:6px;
+      font-size:12px !important;
+    }
+    #page-files .files-menu-panel .files-delete-action {
+      margin-top:5px;
+      border-top:2px solid #a94452;
+      background:#64212b;
+      color:#fff;
+    }
+    #page-files .files-entry-name {
+      overflow-wrap:anywhere;
+    }
+    #page-files button:disabled { opacity:.45 !important; }
+
+    /* FILES STUDIO BUTTON VISIBILITY PATCH */
+    #page-files button {
+      color: #ffffff !important;
+      background: linear-gradient(145deg, #087fca, #06436f) !important;
+      border: 1px solid #35baff !important;
+      box-shadow: 0 0 9px #087fbd44;
+      font-weight: 700 !important;
+      text-shadow: 0 1px 2px #001a30;
+    }
+
+    #page-files button:hover:not(:disabled) {
+      background: linear-gradient(145deg, #10a4f5, #08629c) !important;
+      border-color: #79d4ff !important;
+      box-shadow: 0 0 14px #12aaff77;
+    }
+
+    #page-files .files-entry-open {
+      color: #e5f3ff !important;
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      text-shadow: none;
+    }
+
+    #page-files .files-menu-toggle {
+      min-width: 40px;
+      width: 40px;
+      background: linear-gradient(145deg, #087fca, #06436f) !important;
+      color: #ffffff !important;
+      border: 1px solid #35baff !important;
+      font-size: 22px !important;
+    }
+
+    #page-files .files-menu-panel button {
+      background: #173b5b !important;
+      color: #ffffff !important;
+      border: 1px solid #347ba8 !important;
+      text-align: left;
+    }
+
+    #page-files .files-menu-panel .files-delete-action {
+      background: #852b38 !important;
+      color: #ffffff !important;
+      border: 1px solid #ed6475 !important;
+      border-top: 2px solid #ff8491 !important;
+      margin-top: 7px;
+    }
+
+    #page-files button:disabled {
+      opacity: .45 !important;
+      cursor: not-allowed;
+    }
+
+  </style>
+</section>
+
+    <section class="page" id="page-code"><h2>Code Studio</h2><p>Write and edit Python code.</p><div class="page-panel">Code editor connection pending.</div></section>
+    
+<section class="page" id="page-console">
+  <h2>Console / Terminal</h2>
+  <p>Manage each project console independently.</p>
+
+  <div id="console-project-list-view">
+    <div class="page-panel">
+      <div class="console-list-heading">
+        <div>
+          <strong>PROJECT CONSOLES</strong>
+          <p>Select a project to open its individual console.</p>
+        </div>
+        <button id="console-refresh-projects" type="button">REFRESH</button>
+      </div>
+      <div id="console-project-cards" class="console-project-cards">
+        <p>Loading project consoles...</p>
+      </div>
+      <p id="console-list-message" role="status"></p>
+    </div>
+  </div>
+
+  <div id="console-detail-view" style="display:none">
+    <div class="page-panel">
+      <button id="console-back" type="button">← ALL PROJECT CONSOLES</button>
+
+      <div class="console-top">
+        <div>
+          <small>SELECTED PROJECT</small>
+          <strong id="console-project">No project selected</strong>
+        </div>
+        <div>
+          <small>PROCESS STATUS</small>
+          <strong id="console-status">Not yet</strong>
+        </div>
+      </div>
+
+      <div class="console-runtime">
+        <small>PROCESS RUNTIME</small>
+        <div id="console-runtime">00:00:00</div>
+      </div>
+
+      <div class="console-times">
+        <div><small>STARTED</small><strong id="console-started">Not yet</strong></div>
+        <div><small>STOPPED</small><strong id="console-ended">Not yet</strong></div>
+      </div>
+
+      <div class="console-buttons">
+        <button id="console-start" type="button">START</button>
+        <button id="console-restart" type="button">RESTART</button>
+        <button id="console-end" type="button">STOP</button>
+      </div>
+
+      <p id="console-message" role="status">Select an action.</p>
+
+      <div class="console-log-heading">
+        <h3>Live Console Logs</h3>
+        <button id="console-copy" type="button"
+           class="console-copy-button" style="display:none">COPY LOGS</button>
+      </div>
+
+      <pre id="console-output">Waiting for console activity...</pre>
+
+      <div class="console-history-heading">
+        <h3>Previous Runs</h3>
+        <button id="console-refresh-history" type="button">REFRESH HISTORY</button>
+      </div>
+      <div id="console-history">No previous runs loaded.</div>
+    </div>
+  </div>
+</section>
+
+    <section class="page" id="page-startup"><h2>Startup Manager</h2><p>Manage project startup settings.</p><div class="page-panel">Startup controls connection pending.</div></section>
+    <section class="page" id="page-bots"><h2>Bot Manager</h2><p>Manage your Python bots and services.</p><div class="page-panel">Bot controls connection pending.</div></section>
+    <section class="page" id="page-monitoring">
+  <h2>System Monitoring</h2>
+  <p>Live system readings and independent project process health.</p>
+
+  <div class="page-panel">
+    <strong>SYSTEM HEALTH</strong>
+    
+<div class="monitor-grid monitor-capacity-grid">
+  <div class="monitor-tile monitor-capacity-tile" id="cpu-card">
+    <small>CPU</small>
+    <div class="capacity-line"><span>Available</span><strong id="cpu-available">Checking…</strong></div>
+    <div class="capacity-number" id="cpu-usage">Checking…</div>
+    <div class="capacity-label">Current usage</div>
+    <div class="capacity-track"><div class="capacity-fill" id="cpu-bar"></div></div>
+    <span class="capacity-detail" id="cpu-detail">Reading CPU counters…</span>
+  </div>
+  <div class="monitor-tile monitor-capacity-tile" id="ram-card">
+    <small>RAM</small>
+    <div class="capacity-line"><span>Available</span><strong id="ram-available">Checking…</strong></div>
+    <div class="capacity-number" id="ram-usage">Checking…</div>
+    <div class="capacity-label">Currently in use</div>
+    <div class="capacity-track"><div class="capacity-fill" id="ram-bar"></div></div>
+    <span class="capacity-detail" id="ram-detail">Reading memory…</span>
+  </div>
+  <div class="monitor-tile monitor-capacity-tile" id="storage-card">
+    <small>DEVICE STORAGE</small>
+    <div class="capacity-line"><span>Available</span><strong id="storage-available">Checking…</strong></div>
+    <div class="capacity-number" id="storage-usage">Checking…</div>
+    <div class="capacity-label">Currently occupied</div>
+    <div class="capacity-track"><div class="capacity-fill" id="storage-bar"></div></div>
+    <span class="capacity-detail" id="storage-detail">Reading storage…</span>
+  </div>
+  <div class="monitor-tile">
+    <small>PYFORGE UPTIME</small>
+    <strong id="monitor-uptime">Checking…</strong>
+    <span>Backend process uptime</span>
+  </div>
+</div>
+<p id="monitor-updated" role="status">Waiting for first reading…</p>
+    <button id="monitor-refresh" type="button">↻ REFRESH NOW</button>
+  </div>
+
+  <div class="page-panel">
+    <strong>PROJECT PROCESS HEALTH</strong>
+    <p>Monitoring only. These readings do not start or stop projects.</p>
+    <div id="monitor-projects">Loading project health…</div>
+  </div>
+</section>
+    <section class="page" id="page-backup"><h2>Backup Factory</h2><p>Create and review project backups.</p><div class="page-panel">Backup engine connection pending.</div></section>
+    <section class="page" id="page-storage"><h2>Cloud Storage</h2><p>Manage stored project data.</p><div class="page-panel">Storage connection pending.</div></section>
+    <section class="page" id="page-settings"><h2>Settings</h2><p>Configure your PyForge workspace.</p><div class="page-panel">Workspace settings will appear here.</div></section>
+    <section class="page" id="page-logs"><h2>Logs</h2><p>Review application and system events.</p><div class="page-panel">Log viewer connection pending.</div></section>
+  </main>
+
+  <div class="drawer-backdrop" id="backdrop"></div>
+  <aside class="drawer" id="drawer" aria-label="Main navigation">
+    <div class="drawer-head"><strong>PYFORGE MENU</strong><button class="close-button" id="closeMenu" aria-label="Close menu">×</button></div>
+    <nav class="nav-list">
+      <button class="nav-item active" data-page="dashboard"><span class="nav-icon">⌂</span>Dashboard</button>
+      <button class="nav-item" data-page="projects"><span class="nav-icon">▰</span>Projects</button>
+      <button class="nav-item" data-page="files"><span class="nav-icon">▤</span>Files</button>
+      <button class="nav-item" data-page="code"><span class="nav-icon">‹/›</span>Code Studio</button>
+      <button class="nav-item" data-page="console"><span class="nav-icon">›_</span>Console / Terminal</button>
+      <button class="nav-item" data-page="startup"><span class="nav-icon">🚀</span>Startup Manager</button>
+      <button class="nav-item" data-page="bots"><span class="nav-icon">♙</span>Bot Manager</button>
+      <button class="nav-item" data-page="monitoring"><span class="nav-icon">▥</span>Monitoring</button>
+      <button class="nav-item" data-page="backup"><span class="nav-icon">◴</span>Backup Factory</button>
+      <button class="nav-item" data-page="storage"><span class="nav-icon">☁</span>Cloud Storage</button>
+      <button class="nav-item" data-page="settings"><span class="nav-icon">⚙</span>Settings</button>
+      <button class="nav-item" data-page="logs"><span class="nav-icon">☷</span>Logs</button>
+    </nav>
+    <div class="drawer-foot"><strong>FORGED BY VISION</strong><span>MOKHOTHU FINANCES (PTY) LTD</span>POWERED BY INNOVATION</div>
+  </aside>
+
+  <nav class="bottom-nav" aria-label="Quick navigation">
+    <button data-page="dashboard"><b>⌂</b>Home</button>
+    <button data-page="monitoring"><b>▥</b>Stats</button>
+    <button data-page="logs"><b>♧</b>Notifications</button>
+    <button data-page="settings"><b>⬟</b>Security</button>
+  </nav>
+</div>
+<script>
+const drawer=document.getElementById('drawer');
+const backdrop=document.getElementById('backdrop');
+function openMenu(){drawer.classList.add('open');backdrop.classList.add('show')}
+function closeMenu(){drawer.classList.remove('open');backdrop.classList.remove('show')}
+document.getElementById('menuButton').addEventListener('click',openMenu);
+document.getElementById('closeMenu').addEventListener('click',closeMenu);
+backdrop.addEventListener('click',closeMenu);
+function showPage(name){
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+name));
+ document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
+ closeMenu();window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+</script>
+<script>
+
+// PYFORGE_PROJECT_MANAGER_V1
+(() => {
+  const API = "http://127.0.0.1:8001";
+  const list = document.getElementById("project-list");
+  const count = document.getElementById("project-count");
+  const message = document.getElementById("project-message");
+  const details = document.getElementById("project-details");
+
+  if (!list || !count || !message || !details) return;
+
+  const escapeHTML = value => String(value).replace(/[&<>"']/g, char => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;",
+    '"':"&quot;", "'":"&#39;"
+  })[char]);
+
+  function showMessage(text, error = false) {
+    message.textContent = text;
+    message.style.color = error ? "#ff7777" : "#79e6ae";
+  }
+
+  async function request(url, options = {}) {
+    const response = await fetch(API + url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      }
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data.detail || `Request failed (${response.status})`);
+    }
+    return data;
+  }
+
+  async function loadProjects() {
+    list.textContent = "Loading projects...";
+    details.innerHTML = "";
+    count.textContent = "Connecting to backend...";
+
+    try {
+      const data = await request("/api/projects");
+      count.textContent = `${data.count} project(s)`;
+
+      if (!data.projects.length) {
+        list.innerHTML = '<div style="padding:18px;text-align:center;opacity:.75">No projects yet. Select New Project to create your first workspace.</div>';
+        return;
+      }
+
+      list.innerHTML = data.projects.map(project => `
+        <div style="padding:14px;border:1px solid #42617a;border-radius:10px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap">
+          <div>
+            <strong>${escapeHTML(project.name)}</strong>
+            <div style="font-size:12px;opacity:.7;margin-top:4px">${escapeHTML(project.type)}</div>
+          </div>
+          <button type="button" data-action="open" data-name="${escapeHTML(project.name)}">Open</button><button type="button" data-action="details" data-name="${escapeHTML(project.name)}">Manage</button>
+        </div>
+      `).join("");
+
+      showMessage("Projects loaded successfully.");
+    } catch (error) {
+      count.textContent = "Backend connection problem";
+      list.textContent = "Could not load projects.";
+      showMessage(error.message, true);
+    }
+  }
+
+  async function showDetails(name) {
+    details.textContent = "Loading project details...";
+
+    try {
+      const project = await request("/api/projects/" + encodeURIComponent(name));
+      details.innerHTML = `
+        <div style="padding:15px;border:1px solid #42617a;border-radius:10px">
+          <strong>${escapeHTML(project.name)}</strong>
+          <p style="font-size:12px;opacity:.7">${escapeHTML(project.path)}</p>
+          <strong>Files and folders</strong>
+          <ul>
+            ${project.files.map(file => `<li>${escapeHTML(file.name)} — ${escapeHTML(file.type)}</li>`).join("") || "<li>No files found.</li>"}
+          </ul>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+            <button type="button" data-action="rename" data-name="${escapeHTML(project.name)}">Rename</button>
+            <button type="button" data-action="delete" data-name="${escapeHTML(project.name)}">Delete</button>
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      details.textContent = "";
+      showMessage(error.message, true);
+    }
+  }
+
+  document.getElementById("project-refresh").addEventListener("click", loadProjects);
+
+  document.getElementById("project-create").addEventListener("click", async () => {
+    const name = prompt("Enter a name for your new Python project:");
+    if (name === null) return;
+    if (!name.trim()) {
+      showMessage("Project name cannot be empty.", true);
+      return;
+    }
+
+    try {
+      await request("/api/projects", {
+        method: "POST",
+        body: JSON.stringify({name})
+      });
+      showMessage("Project created successfully.");
+      await loadProjects();
+    } catch (error) {
+      showMessage(error.message, true);
+    }
+  });
+
+  list.addEventListener("click", event => {
+    const button = event.target.closest("button[data-action]");
+    if (!button) return;
+
+    if (button.dataset.action === "open") {
+      window.PYFORGE_SELECTED_PROJECT = button.dataset.name;
+      window.showPage("files");
+      window.dispatchEvent(new CustomEvent("pyforge-project-opened", {
+        detail: {name: button.dataset.name}
+      }));
+    } else if (button.dataset.action === "details") {
+      showDetails(button.dataset.name);
+    }
+  });
+
+  details.addEventListener("click", async event => {
+    const button = event.target.closest("button[data-action]");
+    if (!button) return;
+
+    const name = button.dataset.name;
+    const action = button.dataset.action;
+
+    if (action === "rename") {
+      const newName = prompt("Enter the new project name:", name);
+      if (newName === null || !newName.trim()) return;
+
+      try {
+        await request("/api/projects/" + encodeURIComponent(name), {
+          method: "PATCH",
+          body: JSON.stringify({new_name: newName})
+        });
+        showMessage("Project renamed successfully.");
+        await loadProjects();
+      } catch (error) {
+        showMessage(error.message, true);
+      }
+    }
+
+    if (action === "delete") {
+      if (!confirm(`Are you sure you want to permanently delete "${name}"?`)) return;
+
+      try {
+        await request("/api/projects/" + encodeURIComponent(name), {
+          method: "DELETE",
+          body: JSON.stringify({confirm: true})
+        });
+        showMessage("Project deleted.");
+        await loadProjects();
+      } catch (error) {
+        showMessage(error.message, true);
+      }
+    }
+  });
+
+  document.querySelectorAll('[data-page="projects"]').forEach(button => {
+    button.addEventListener("click", loadProjects);
+  });
+
+  loadProjects();
+})();
+
+</script>
+
+<script>
+// PYFORGE_FILES_STUDIO_V2
+(() => {
+  const API = "http://127.0.0.1:8001";
+  const $ = id => document.getElementById(id);
+
+  const picker = $("files-project-picker");
+  const workspace = $("files-workspace");
+  const projectList = $("files-project-list");
+  const projectCount = $("files-project-count");
+  const projectLabel = $("files-project-name");
+  const status = $("files-status");
+  const pathLabel = $("files-path");
+  const fileList = $("files-list");
+  const editor = $("files-editor");
+  const editorTitle = $("files-editor-title");
+  const lineNumbers = $("files-line-numbers");
+  const editorState = $("files-editor-state");
+
+  if (!picker || !workspace || !editor || !lineNumbers) {
+    console.error("Files Studio: required HTML elements are missing.");
+    return;
+  }
+
+  let project = "";
+  let directory = "";
+  let currentFile = "";
+  let dirty = false;
+
+  const enc = encodeURIComponent;
+
+  const escapeHTML = value => String(value).replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;",
+    '"': "&quot;", "'": "&#39;"
+  })[c]);
+
+  function message(value, error = false) {
+    status.textContent = value;
+    status.style.color = error ? "#ff7777" : "#79e6ae";
+  }
+
+  async function request(url, options = {}) {
+    const response = await fetch(API + url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      }
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      const detail = typeof data.detail === "string"
+        ? data.detail : JSON.stringify(data.detail || data);
+      throw new Error(detail || `Request failed (${response.status})`);
+    }
+    return data;
+  }
+
+  function canLeaveEditor() {
+    return !dirty || confirm(
+      "You have unsaved changes. Leave without saving?"
+    );
+  }
+
+  function updateLineNumbers() {
+    const count = Math.max(1, editor.value.split("\n").length);
+    lineNumbers.textContent = Array.from(
+      {length: count}, (_, i) => i + 1
+    ).join("\n");
+
+    lineNumbers.scrollTop = editor.scrollTop;
+
+    if (editorState) {
+      editorState.textContent = dirty
+        ? "● Unsaved changes"
+        : currentFile ? "✓ Saved" : "No file open";
+      editorState.style.color = dirty ? "#ffd36a" : "#8bb4d4";
+    }
+  }
+
+  function clearEditor() {
+    currentFile = "";
+    dirty = false;
+    editor.value = "";
+    editor.disabled = true;
+    editorTitle.textContent = "File Editor";
+    updateLineNumbers();
+  }
+
+  async function loadProjects() {
+    projectCount.textContent = "Loading projects...";
+    projectList.textContent = "Connecting to PyForge...";
+
+    try {
+      const data = await request("/api/projects");
+      projectCount.textContent = `${data.count} project(s) available`;
+
+      if (!data.projects || !data.projects.length) {
+        projectList.textContent =
+          "No projects found. Create one from the Projects page first.";
+        return;
+      }
+
+      projectList.innerHTML = data.projects.map(item => `
+        <div style="display:flex;gap:12px;align-items:center;
+          justify-content:space-between;flex-wrap:wrap;padding:14px;
+          border:1px solid #42617a;border-radius:10px;background:#10243a">
+          <div style="min-width:0">
+            <strong>${escapeHTML(item.name)}</strong>
+            <div style="font-size:12px;opacity:.7;margin-top:4px">
+              ${escapeHTML(item.type || "Project")}
+            </div>
+          </div>
+          <button type="button"
+            data-open-project="${escapeHTML(item.name)}">
+            Open Workspace →
+          </button>
+        </div>
+      `).join("");
+    } catch (error) {
+      projectCount.textContent = "Backend connection problem";
+      projectList.textContent = "Could not load projects.";
+      console.error(error);
+    }
+  }
+
+  async function loadDirectory(nextDirectory = "", skipGuard = false) {
+    if (!project) return;
+    if (!skipGuard && !canLeaveEditor()) return;
+
+    clearEditor();
+    directory = nextDirectory;
+    pathLabel.textContent = "/" + (directory || "");
+    fileList.textContent = "Loading files...";
+
+    try {
+      const data = await request(
+        `/api/projects/${enc(project)}/files?directory=${enc(directory)}`
+      );
+
+      if (!data.entries.length) {
+        fileList.textContent = "This folder is empty.";
+        message("Folder loaded successfully.");
+        return;
+      }
+
+      fileList.innerHTML = data.entries.map(entry => {
+        const folder = entry.type === "folder";
+        const path = escapeHTML(entry.path);
+        const name = escapeHTML(entry.name);
+
+        return `
+          <div class="files-entry">
+            <button type="button" class="files-entry-open"
+              data-kind="${folder ? "folder" : "file"}"
+              data-path="${path}">
+              <span class="files-entry-name">
+                ${folder ? "📁" : "📄"} ${name}
+              </span>
+              <span style="display:block;font-size:11px;opacity:.65">
+                ${folder ? "Folder" : "File"}
+              </span>
+            </button>
+            <div class="files-menu">
+              <button type="button" class="files-menu-toggle"
+                aria-label="Actions for ${name}"
+                aria-expanded="false">⋮</button>
+              <div class="files-menu-panel">
+                ${folder ? "" : `<button data-action="edit" data-path="${path}">✏️ Edit</button>`}
+                ${folder ? "" : `<button data-action="copy" data-path="${path}">📋 Copy contents</button>`}
+                ${folder ? "" : `<button data-action="duplicate" data-path="${path}">▣ Duplicate</button>`}
+                <button data-action="copy-path" data-path="${path}">🔗 Copy path</button>
+                <button data-action="rename" data-path="${path}">✏️ Rename</button>
+                ${folder ? "" : `<button data-action="download" data-path="${path}">↓ Download</button>`}
+                <button class="files-delete-action"
+                  data-action="delete" data-kind="${folder ? "folder" : "file"}"
+                  data-path="${path}">🗑 Delete</button>
+              </div>
+            </div>
+          </div>`;
+      }).join("");
+
+      message(`${data.entries.length} item(s) loaded.`);
+    } catch (error) {
+      fileList.textContent = "Could not load this folder.";
+      message(error.message, true);
+    }
+  }
+
+  async function openFile(path) {
+    if (!canLeaveEditor()) return;
+
+    try {
+      const data = await request(
+        `/api/projects/${enc(project)}/file?path=${enc(path)}`
+      );
+
+      currentFile = path;
+      editor.value = data.content;
+      editor.disabled = false;
+      dirty = false;
+      editorTitle.textContent = path;
+      updateLineNumbers();
+      message("File opened.");
+      editor.focus();
+    } catch (error) {
+      message("Could not open file: " + error.message, true);
+    }
+  }
+
+  async function saveFile() {
+    if (!project || !currentFile) {
+      message("Open a file before saving.", true);
+      return;
+    }
+
+    try {
+      const result = await request(
+        `/api/projects/${enc(project)}/file`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            path: currentFile,
+            content: editor.value
+          })
+        }
+      );
+
+      dirty = false;
+      updateLineNumbers();
+      message(result.message || "File saved.");
+    } catch (error) {
+      message("Save failed: " + error.message, true);
+    }
+  }
+
+  async function createFolder() {
+    if (!project) return message("Open a project first.", true);
+    if (!canLeaveEditor()) return;
+
+    const name = prompt("Enter the new folder name:");
+    if (name === null) return;
+    if (!name.trim()) return message("Folder name cannot be empty.", true);
+
+    const path = directory
+      ? `${directory}/${name.trim()}` : name.trim();
+
+    try {
+      await request(`/api/projects/${enc(project)}/folder`, {
+        method: "POST",
+        body: JSON.stringify({path})
+      });
+      message("Folder created.");
+      await loadDirectory(directory, true);
+    } catch (error) {
+      message("Folder creation failed: " + error.message, true);
+    }
+  }
+
+  async function createFile() {
+    if (!project) return message("Open a project first.", true);
+    if (!canLeaveEditor()) return;
+
+    const name = prompt("Enter a filename, including its extension:");
+    if (name === null) return;
+    if (!name.trim()) return message("Filename cannot be empty.", true);
+
+    const path = directory
+      ? `${directory}/${name.trim()}` : name.trim();
+
+    try {
+      await request(`/api/projects/${enc(project)}/file`, {
+        method: "POST",
+        body: JSON.stringify({path, content: ""})
+      });
+      message("File created.");
+      await loadDirectory(directory, true);
+      await openFile(path);
+    } catch (error) {
+      message("File creation failed: " + error.message, true);
+    }
+  }
+
+  async function handleItemAction(action, path, kind) {
+    if (["rename", "duplicate", "delete"].includes(action)) {
+      if (!canLeaveEditor()) return;
+    }
+
+    try {
+      if (action === "edit") {
+        await openFile(path);
+        return;
+      }
+
+      if (action === "copy") {
+        const data = await request(
+          `/api/projects/${enc(project)}/file?path=${enc(path)}`
+        );
+        try {
+          await navigator.clipboard.writeText(data.content);
+          message("File contents copied.");
+        } catch (_) {
+          prompt("Copy the file contents:", data.content);
+        }
+        return;
+      }
+
+      if (action === "copy-path") {
+        const value = `projects/${project}/${path}`;
+        try {
+          await navigator.clipboard.writeText(value);
+          message("Path copied: " + value);
+        } catch (_) {
+          prompt("Copy this path:", value);
+        }
+        return;
+      }
+
+      if (action === "download") {
+        const link = document.createElement("a");
+        link.href = `${API}/api/projects/${enc(project)}/download?path=${enc(path)}`;
+        link.download = path.split("/").pop();
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        message("Download requested.");
+        return;
+      }
+
+      if (action === "rename") {
+        const oldName = path.split("/").pop();
+        const newName = prompt("Enter the new name:", oldName);
+        if (newName === null || !newName.trim()) return;
+
+        await request(`/api/projects/${enc(project)}/item/rename`, {
+          method: "POST",
+          body: JSON.stringify({path, new_name: newName.trim()})
+        });
+
+        if (currentFile === path) clearEditor();
+        message("Item renamed.");
+        await loadDirectory(directory, true);
+        return;
+      }
+
+      if (action === "duplicate") {
+        const oldName = path.split("/").pop();
+        const dot = oldName.lastIndexOf(".");
+        const suggested = dot > 0
+          ? oldName.slice(0, dot) + "_copy" + oldName.slice(dot)
+          : oldName + "_copy";
+
+        const newName = prompt("Name for the duplicate:", suggested);
+        if (newName === null || !newName.trim()) return;
+
+        await request(`/api/projects/${enc(project)}/item/duplicate`, {
+          method: "POST",
+          body: JSON.stringify({path, new_name: newName.trim()})
+        });
+
+        message("File duplicated.");
+        await loadDirectory(directory, true);
+        return;
+      }
+
+      if (action === "delete") {
+        const itemName = path.split("/").pop();
+        const warning = kind === "folder"
+          ? `Delete folder "${itemName}" and everything inside it? This cannot be undone.`
+          : `Delete file "${itemName}"? This cannot be undone.`;
+
+        if (!confirm(warning)) return;
+
+        await request(`/api/projects/${enc(project)}/item`, {
+          method: "DELETE",
+          body: JSON.stringify({path})
+        });
+
+        if (currentFile === path || currentFile.startsWith(path + "/")) {
+          clearEditor();
+        }
+
+        message("Item deleted.");
+        await loadDirectory(directory, true);
+      }
+    } catch (error) {
+      message("Action failed: " + error.message, true);
+    }
+  }
+
+  function selectProject(name) {
+    if (!canLeaveEditor()) return;
+
+    project = name;
+    directory = "";
+    clearEditor();
+    picker.hidden = true;
+    workspace.hidden = false;
+    projectLabel.textContent = name;
+    loadDirectory("", true);
+  }
+
+  $("files-project-refresh").addEventListener("click", loadProjects);
+
+  projectList.addEventListener("click", event => {
+    const button = event.target.closest("[data-open-project]");
+    if (button) selectProject(button.dataset.openProject);
+  });
+
+  $("files-back-projects").addEventListener("click", () => {
+    if (!canLeaveEditor()) return;
+    project = "";
+    directory = "";
+    clearEditor();
+    workspace.hidden = true;
+    picker.hidden = false;
+    loadProjects();
+  });
+
+  $("files-refresh").addEventListener("click", () => loadDirectory(directory));
+
+  $("files-up").addEventListener("click", () => {
+    if (!directory) return message("Already at the project root.");
+    const parts = directory.split("/");
+    parts.pop();
+    loadDirectory(parts.join("/"));
+  });
+
+  $("files-new-folder").addEventListener("click", createFolder);
+  $("files-new-file").addEventListener("click", createFile);
+  $("files-save").addEventListener("click", saveFile);
+
+  $("files-download-zip").addEventListener("click", () => {
+    if (!project) return;
+    const link = document.createElement("a");
+    link.href = `${API}/api/projects/${enc(project)}/download-zip`;
+    link.download = `${project}.zip`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    message("Project ZIP download requested.");
+  });
+
+  $("files-close-editor").addEventListener("click", () => {
+    if (!canLeaveEditor()) return;
+    clearEditor();
+    message("Editor closed.");
+  });
+
+  editor.addEventListener("input", () => {
+    dirty = true;
+    updateLineNumbers();
+    message("Unsaved changes.");
+  });
+
+  editor.addEventListener("scroll", () => {
+    lineNumbers.scrollTop = editor.scrollTop;
+  });
+
+  fileList.addEventListener("click", event => {
+    const toggle = event.target.closest(".files-menu-toggle");
+
+    if (toggle) {
+      const panel = toggle.parentElement.querySelector(".files-menu-panel");
+      const opening = !panel.classList.contains("open");
+
+      document.querySelectorAll("#page-files .files-menu-panel.open")
+        .forEach(item => item.classList.remove("open"));
+
+      if (opening) {
+        panel.classList.add("open");
+        toggle.setAttribute("aria-expanded", "true");
+      } else {
+        toggle.setAttribute("aria-expanded", "false");
+      }
+      return;
+    }
+
+    const actionButton = event.target.closest("button[data-action]");
+    if (actionButton) {
+      handleItemAction(
+        actionButton.dataset.action,
+        actionButton.dataset.path,
+        actionButton.dataset.kind
+      );
+      actionButton.closest(".files-menu-panel").classList.remove("open");
+      return;
+    }
+
+    const openButton = event.target.closest("button[data-kind]");
+    if (!openButton) return;
+
+    const path = openButton.dataset.path;
+    if (openButton.dataset.kind === "folder") {
+      loadDirectory(path);
+    } else {
+      openFile(path);
+    }
+  });
+
+  document.addEventListener("click", event => {
+    if (!event.target.closest("#page-files .files-menu")) {
+      document.querySelectorAll("#page-files .files-menu-panel.open")
+        .forEach(item => item.classList.remove("open"));
+    }
+  });
+
+  document.querySelectorAll('[data-page="files"]').forEach(button => {
+    button.addEventListener("click", () => {
+      if (project) loadDirectory(directory);
+      else loadProjects();
+    });
+  });
+
+  window.addEventListener("pyforge-project-opened", event => {
+    if (event.detail && event.detail.name) {
+      selectProject(event.detail.name);
+    }
+  });
+
+  window.addEventListener("beforeunload", event => {
+    if (dirty) {
+      event.preventDefault();
+      event.returnValue = "";
+    }
+  });
+
+  if (window.PYFORGE_SELECTED_PROJECT) {
+    selectProject(window.PYFORGE_SELECTED_PROJECT);
+  } else {
+    loadProjects();
+  }
+})();
+</script>
+
+
+<style>
+#pyforge-console-panel{display:block;text-align:left;padding:16px}
+.console-top,.console-times{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.console-top>div,.console-times>div{display:flex;flex-direction:column;gap:6px;min-width:120px}
+#pyforge-console-panel small{color:#8bb4d4;font-size:11px;letter-spacing:1px}
+#console-project{overflow-wrap:anywhere;color:#d9efff}
+#console-status{color:#55e6a5}
+.console-runtime{margin:20px 0;padding:20px;text-align:center;background:#071321;border:1px solid #315575;border-radius:12px}
+#console-runtime{font-size:clamp(32px,8vw,48px);font-weight:800;color:#55e6a5;font-variant-numeric:tabular-nums;letter-spacing:2px;margin-top:8px}
+.console-times{margin:15px 0}
+.console-times strong{font-size:12px;overflow-wrap:anywhere}
+.console-buttons{display:flex;gap:10px;margin:20px 0;flex-wrap:wrap}
+.console-buttons button{flex:1;min-width:85px;padding:14px 8px;border:1px solid #398ac0;border-radius:8px;background:#10365a;color:#fff;font-weight:800}
+.console-buttons button:first-child{background:#087b55;border-color:#20c98a}
+.console-buttons button:last-child{background:#71333b;border-color:#bd6570}
+.console-buttons button:disabled{opacity:.4}
+#console-message{color:#9dc8e8;overflow-wrap:anywhere}
+#console-output,#console-history{min-height:65px;max-height:240px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;background:#050d17;color:#b8e7d0;border:1px solid #29435b;border-radius:8px;font-size:12px}
+</style>
+
+
+<script>
+// PYFORGE_CONSOLE_UI_V3
+(() => {
+  const API = "http://127.0.0.1:8001";
+  const $ = id => document.getElementById(id);
+
+  let selectedProject = "";
+  let lastStatus = null;
+  let busy = false;
+  let clientDiagnostics = [];
+
+  const names = {
+    running: "Running",
+    stopped: "Stopped",
+    starting: "Starting",
+    stopping: "Stopping",
+    interrupted: "Interrupted",
+    error: "Error",
+    idle: "Not running"
+  };
+
+  const formatTime = value => {
+    if (!value) return "Not yet";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+  };
+
+  const formatRuntime = seconds => {
+    const n = Math.max(0, Math.floor(Number(seconds) || 0));
+    const h = String(Math.floor(n / 3600)).padStart(2, "0");
+    const m = String(Math.floor((n % 3600) / 60)).padStart(2, "0");
+    const sec = String(n % 60).padStart(2, "0");
+    return `${h}:${m}:${sec}`;
+  };
+
+  async function api(path, options = {}) {
+    const response = await fetch(API + path, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      }
+    });
+
+    const body = await response.text();
+    let data = {};
+
+    try {
+      data = body ? JSON.parse(body) : {};
+    } catch {
+      throw new Error(`Unreadable backend response (${response.status}).`);
+    }
+
+    if (!response.ok) {
+      throw new Error(data.detail || data.error || `Backend error ${response.status}`);
+    }
+    return data;
+  }
+
+  async function copyLog(url, button) {
+    if (!url) return;
+
+    const original = button.textContent;
+    button.disabled = true;
+    button.textContent = "COPYING...";
+
+    try {
+      const response = await fetch(API + url);
+      if (!response.ok) {
+        throw new Error("Could not retrieve the log.");
+      }
+
+      const logText = await response.text();
+
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(logText);
+      } else {
+        const area = document.createElement("textarea");
+        area.value = logText;
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.appendChild(area);
+        area.select();
+        const copied = document.execCommand("copy");
+        area.remove();
+        if (!copied) throw new Error("Clipboard access was denied.");
+      }
+
+      button.textContent = "COPIED!";
+    } catch (error) {
+      button.textContent = "COPY FAILED";
+      console.error("Log copy failed:", error);
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  function showList() {
+    selectedProject = "";
+    lastStatus = null;
+    $("console-detail-view").style.display = "none";
+    $("console-project-list-view").style.display = "block";
+    refreshProjects();
+  }
+
+  function openConsole(project) {
+    selectedProject = project;
+    lastStatus = null;
+    $("console-project-list-view").style.display = "none";
+    $("console-detail-view").style.display = "block";
+    $("console-project").textContent = project;
+    $("console-output").textContent = "Connecting to project console...";
+    $("console-history").textContent = "Loading run history...";
+    $("console-message").textContent = "Individual console opened. No process was started.";
+    updateButtons();
+    refreshDetail();
+    refreshHistory();
+  }
+
+  function updateButtons() {
+    const status = lastStatus?.status || "idle";
+    const running = ["running", "starting", "stopping"].includes(status);
+
+    $("console-start").disabled = busy || !selectedProject || running;
+    $("console-restart").disabled = busy || !selectedProject;
+    $("console-end").disabled = busy || status !== "running";
+  }
+
+  function renderStatus(data) {
+    lastStatus = data || {};
+    const status = data.status || "idle";
+
+    $("console-status").textContent = names[status] || status;
+    $("console-status").style.color =
+      status === "running" ? "#55e6a5" :
+      status === "error" ? "#ff7d86" : "#9dc8e8";
+
+    $("console-runtime").textContent = formatRuntime(data.runtime_seconds);
+    $("console-started").textContent = formatTime(data.started_at);
+    $("console-ended").textContent = formatTime(data.ended_at);
+
+    const lines = Array.isArray(data.output) ? data.output : [];
+    const diagnostics = clientDiagnostics.slice(-20);
+    const combined = lines.concat(diagnostics);
+
+    $("console-output").textContent = combined.length
+      ? combined.join("\n")
+      : "No console output captured yet.";
+
+    const copyButton = $("console-copy");
+    if (data.log_url) {
+      copyButton.dataset.logUrl = data.log_url;
+      copyButton.style.display = "inline-block";
+    } else {
+      delete copyButton.dataset.logUrl;
+      copyButton.style.display = "none";
+    }
+
+    updateButtons();
+
+    const output = $("console-output");
+    output.scrollTop = output.scrollHeight;
+  }
+
+  async function refreshProjects() {
+    try {
+      const data = await api("/api/console/projects");
+      const projects = data.projects || [];
+      const container = $("console-project-cards");
+      container.replaceChildren();
+
+      if (!projects.length) {
+        container.textContent = "No projects found. Create a project first.";
+        return;
+      }
+
+      for (const project of projects) {
+        const card = document.createElement("div");
+        card.className = "console-project-card";
+
+        const details = document.createElement("div");
+        details.className = "console-card-details";
+
+        const title = document.createElement("strong");
+        title.textContent = project.name;
+
+        const status = document.createElement("span");
+        status.className = "console-card-status";
+        status.textContent = names[project.status] || project.status || "Unknown";
+
+        const runtime = document.createElement("small");
+        runtime.textContent = "Runtime: " + formatRuntime(project.runtime_seconds);
+
+        details.append(title, status, runtime);
+
+        const open = document.createElement("button");
+        open.type = "button";
+        open.textContent = "OPEN CONSOLE";
+        open.addEventListener("click", () => openConsole(project.name));
+
+        card.append(details, open);
+        container.append(card);
+      }
+
+      $("console-list-message").textContent =
+        `${projects.length} project console(s) detected.`;
+    } catch (error) {
+      $("console-project-cards").textContent =
+        "Could not load project consoles: " + error.message;
+      $("console-list-message").textContent = "Check that the backend is running.";
+    }
+  }
+
+  async function refreshDetail() {
+    if (!selectedProject) return;
+
+    try {
+      const data = await api(
+        "/api/console/status/" + encodeURIComponent(selectedProject)
+      );
+      renderStatus(data);
+    } catch (error) {
+      $("console-status").textContent = "Connection unavailable";
+      $("console-status").style.color = "#ff7d86";
+      $("console-message").textContent = "BACKEND ERROR: " + error.message;
+      updateButtons();
+    }
+  }
+
+  async function refreshHistory() {
+    if (!selectedProject) return;
+
+    try {
+      const data = await api(
+        "/api/console/history/" + encodeURIComponent(selectedProject)
+      );
+      const history = $("console-history");
+      history.replaceChildren();
+
+      const runs = data.runs || [];
+      if (!runs.length) {
+        history.textContent = "No previous runs recorded for this project.";
+        return;
+      }
+
+      for (const run of runs) {
+        const item = document.createElement("div");
+        item.className = "console-history-item";
+
+        const heading = document.createElement("strong");
+        heading.textContent = names[run.status] || run.status || "Run";
+
+        const info = document.createElement("small");
+        info.textContent =
+          "Started: " + formatTime(run.started_at) +
+          " | Ended: " + formatTime(run.ended_at) +
+          " | Runtime: " + formatRuntime(run.runtime_seconds) +
+          (run.return_code !== null && run.return_code !== undefined
+            ? " | Exit code: " + run.return_code : "");
+
+        item.append(heading, info);
+
+        if (run.log_url) {
+          const copyButton = document.createElement("button");
+          copyButton.type = "button";
+          copyButton.className = "console-copy-button";
+          copyButton.textContent = "COPY THIS RUN";
+          copyButton.addEventListener("click", () =>
+            copyLog(run.log_url, copyButton)
+          );
+          item.append(copyButton);
+        }
+
+        history.append(item);
+      }
+    } catch (error) {
+      $("console-history").textContent = "History unavailable: " + error.message;
+    }
+  }
+
+  async function runAction(action) {
+    if (busy || !selectedProject) return;
+
+    busy = true;
+    updateButtons();
+
+    try {
+      $("console-message").textContent = action.toUpperCase() + " request in progress...";
+
+      const result = await api("/api/console/" + action, {
+        method: "POST",
+        body: JSON.stringify({ project: selectedProject })
+      });
+
+      renderStatus(result);
+      $("console-message").textContent =
+        action.toUpperCase() + " request completed.";
+      await refreshHistory();
+      await refreshProjects();
+    } catch (error) {
+      const diagnostic =
+        `[${new Date().toLocaleString()}] ${action.toUpperCase()} ERROR: ${error.message}`;
+      clientDiagnostics.push(diagnostic);
+      clientDiagnostics = clientDiagnostics.slice(-30);
+      $("console-message").textContent = diagnostic;
+      $("console-output").textContent += "\n" + diagnostic;
+    } finally {
+      busy = false;
+      updateButtons();
+      await refreshDetail();
+    }
+  }
+
+  $("console-copy").addEventListener("click", () => {
+    copyLog($("console-copy").dataset.logUrl, $("console-copy"));
+  });
+  $("console-back").addEventListener("click", showList);
+  $("console-refresh-projects").addEventListener("click", refreshProjects);
+  $("console-refresh-history").addEventListener("click", refreshHistory);
+  $("console-start").addEventListener("click", () => runAction("start"));
+  $("console-restart").addEventListener("click", () => runAction("restart"));
+  $("console-end").addEventListener("click", () => runAction("stop"));
+
+  showList();
+
+  setInterval(() => {
+    if (selectedProject) {
+      refreshDetail();
+    } else if ($("console-project-list-view").style.display !== "none") {
+      refreshProjects();
+    }
+  }, 2000);
+})();</script>
+
+</body>
+</html>
+
+
+<style>
+.monitor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.monitor-tile{padding:14px;border:1px solid #087ed4;border-radius:12px;background:linear-gradient(145deg,#0b2c50,#020b1d);display:flex;flex-direction:column;gap:7px;min-width:0}
+.monitor-tile small{color:#9edfff;font-size:11px;letter-spacing:1px}
+.monitor-tile strong{font-size:21px;color:#e5f7ff;overflow-wrap:anywhere}
+.monitor-tile span{font-size:11px;color:#a9c8e4}
+.monitor-project{padding:12px;margin-top:9px;border:1px solid #24577d;border-radius:10px;background:#06172b;overflow-wrap:anywhere}
+.monitor-project strong{display:block;color:#e3f5ff}
+.monitor-project span{font-size:12px;color:#a9c8e4}
+#monitor-updated{font-size:11px;opacity:.75}
+@media(max-width:340px){.monitor-grid{grid-template-columns:1fr}}
+
+.monitor-capacity-grid { grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); }
+.monitor-capacity-tile { gap:9px; display:flex; flex-direction:column; }
+.capacity-line { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.capacity-line span { font-size:11px; color:#a9c8e4; }
+.capacity-line strong { font-size:15px; color:#65e6a2; }
+.capacity-number { font-size:27px; font-weight:800; color:#e5f7ff; }
+.capacity-label { font-size:11px; color:#a9c8e4; }
+.capacity-track { height:9px; width:100%; overflow:hidden; border-radius:20px; background:#18344e; }
+.capacity-fill { height:100%; width:0%; border-radius:20px; background:#16a34a; transition:width .8s ease,background .5s ease; }
+.capacity-fill.warning { background:#eab308; }
+.capacity-fill.critical { background:#ef4444; }
+.capacity-detail { font-size:10px!important; line-height:1.5; color:#a9c8e4!important; overflow-wrap:anywhere; }
+
+</style>
+
+<script>
+// PYFORGE_SYSTEM_MONITORING_UI_V2
+(() => {
+  const API = "http://127.0.0.1:8001";
+  const $ = id => document.getElementById(id);
+
+  const formatBytes = value => {
+    if (value == null) return "Unavailable";
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    let amount = value, index = 0;
+    while (amount >= 1024 && index < units.length - 1) {
+      amount /= 1024;
+      index++;
+    }
+    return amount.toFixed(2) + " " + units[index];
+  };
+
+  const formatDuration = seconds => {
+    seconds = Math.max(0, Math.floor(seconds || 0));
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return (days ? days + "d " : "") +
+      String(hours).padStart(2, "0") + ":" +
+      String(minutes).padStart(2, "0") + ":" +
+      String(seconds % 60).padStart(2, "0");
+  };
+
+  const safe = value => String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  })[c]);
+
+  function setCapacity(prefix, resource) {
+    const usage = resource?.used_percent;
+    const available = resource?.available_percent ??
+      (usage == null ? null : 100 - usage);
+
+    if (usage == null || available == null) {
+      $(prefix + "-available").textContent = "Unavailable";
+      $(prefix + "-usage").textContent = "Unavailable";
+      $(prefix + "-detail").textContent = "Reading unavailable";
+      $(prefix + "-bar").style.width = "0%";
+      return;
+    }
+
+    const used = Math.max(0, Math.min(100, usage));
+    const free = Math.max(0, Math.min(100, available));
+    const bar = $(prefix + "-bar");
+
+    $(prefix + "-available").textContent = free.toFixed(1) + "%";
+    $(prefix + "-usage").textContent = used.toFixed(1) + "%";
+    bar.style.width = used + "%";
+    bar.classList.toggle("warning", used >= 75 && used < 90);
+    bar.classList.toggle("critical", used >= 90);
+
+    $(prefix + "-detail").textContent =
+      "Used: " + formatBytes(resource.used_bytes) +
+      " · Remaining: " + formatBytes(resource.available_bytes) +
+      " · Total: " + formatBytes(resource.total_bytes);
+  }
+
+  async function refresh() {
+    try {
+      const response = await fetch(API + "/api/monitoring/summary", {
+        cache: "no-store"
+      });
+      if (!response.ok) throw new Error("API returned " + response.status);
+
+      const data = await response.json();
+
+      // Android currently blocks our CPU counters.
+      $("cpu-available").textContent = "Unavailable";
+      $("cpu-usage").textContent = "Unavailable";
+      $("cpu-detail").textContent =
+        "Android restricts CPU counters; no usage estimate is displayed.";
+      $("cpu-bar").style.width = "0%";
+
+      setCapacity("ram", data.memory);
+      setCapacity("storage", data.storage);
+
+      $("cpu-value").textContent = "Restricted";
+      $("ram-value").textContent =
+        data.memory?.used_percent == null ? "Unavailable" :
+        data.memory.used_percent.toFixed(1) + "%";
+      $("storage-value").textContent =
+        data.storage?.used_percent == null ? "Unavailable" :
+        data.storage.used_percent.toFixed(1) + "%";
+      $("server-value").textContent = "ONLINE";
+
+      $("monitor-uptime").textContent =
+        formatDuration(data.app_uptime_seconds);
+
+      const projects = Array.isArray(data.projects) ? data.projects : [];
+      $("monitor-projects").innerHTML = projects.length
+        ? projects.map(project => `
+          <div class="monitor-project">
+            <strong>${safe(project.name)}</strong>
+            <span>Status: ${safe(project.status)} · Runtime: ${formatDuration(project.runtime_seconds)}</span>
+          </div>`).join("")
+        : "<p>No projects detected.</p>";
+
+      $("monitor-updated").textContent =
+        "Last updated: " + new Date(data.timestamp).toLocaleString();
+
+    } catch (error) {
+      $("server-value").textContent = "OFFLINE";
+      $("monitor-updated").textContent =
+        "Monitoring connection failed: " + error.message;
+    }
+  }
+
+  $("monitor-refresh")?.addEventListener("click", refresh);
+  refresh();
+  setInterval(refresh, 5000);
+})();
+</script>

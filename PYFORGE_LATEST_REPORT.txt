@@ -1,0 +1,857 @@
+
+=================================================================
+PYFORGE CLOUD - LIVE PROJECT REPORT
+=================================================================
+Date: Mon Nov 16 14:15:47 2026
+Directory: /data/data/com.termux/files/home/PyForge
+
+
+=================================================================
+1. PROJECT FILE STRUCTURE
+=================================================================
+backup_factory/engine.py
+backup_factory/file_edits/PyForge Test Lab/modules/hello.py.20261115_134519_078729.bak
+backups/before_multibot_ui_20261115_154500/index.html
+backups/checkpoints/file-manager-20261115-174636.py
+backups/checkpoints/index-20261115-174636.html
+backups/checkpoints/index-before-files-button-colors.html
+backups/checkpoints/index-before-files-js-repair.html
+backups/checkpoints/index-before-files-repair-20261115-180058.html
+backups/checkpoints/index-before-home-live-metrics.html
+backups/checkpoints/index-before-monitor-button-style.html
+backups/checkpoints/index-before-monitoring-button-handler-fix.html
+backups/checkpoints/index-before-monitoring-script-fix.html
+backups/checkpoints/main-20261115-174636.py
+backups/full/PyForge-20261115-171719.tar.gz
+backups/full/PyForge-FilesStudio-20261115-174310.tar.gz
+backups/full/PyForge-automatic-20261115_170736.tar.gz
+backups/full/PyForge-automatic-20261115_170736.tar.json
+backups/full/PyForge-automatic-20261115_170736.tar.sha256
+backups/full/PyForge-automatic-20261115_171704.tar.gz
+backups/full/PyForge-automatic-20261115_171704.tar.json
+backups/full/PyForge-automatic-20261115_171704.tar.sha256
+backups/full/PyForge-automatic-20261116_092048_644356.tar.gz
+backups/full/PyForge-automatic-20261116_092048_644356.tar.json
+backups/full/PyForge-automatic-20261116_092048_644356.tar.sha256
+backups/full/PyForge-automatic-20261116_094108_795812.tar.gz
+backups/full/PyForge-automatic-20261116_094108_795812.tar.json
+backups/full/PyForge-automatic-20261116_094108_795812.tar.sha256
+backups/full/PyForge-automatic-20261116_095004_828793.tar.gz
+backups/full/PyForge-automatic-20261116_095004_828793.tar.json
+backups/full/PyForge-automatic-20261116_095004_828793.tar.sha256
+backups/full/PyForge-automatic-20261116_095609_574229.tar.gz
+backups/full/PyForge-automatic-20261116_095609_574229.tar.json
+backups/full/PyForge-automatic-20261116_095609_574229.tar.sha256
+backups/full/PyForge-before-BackupFactory-20261115-184857.tar.gz
+backups/full/PyForge-before-BackupFactory-20261115-185110.tar.gz
+backups/full/PyForge-before-Files-Studio-20261115-173248.tar.gz
+backups/index.html.before-live-capacity
+backups/index.html.before-monitoring-20261115_164008
+backups/index.html.before-monitoring-ui
+backups/main.py.before-monitoring-20261115_164008
+backups/pre_multibot/index.html
+backups/pre_multibot/main.py
+backups/pre_multibot/process_manager.py
+backups/process_manager.py.before-guardian
+backups/pyforge-supervisor-before-guardian-20261116_112243.sh
+backups/system_monitor.py.before-guardian
+configuration/config.py
+dashboard/app.js
+dashboard/index.html
+dashboard/style.css
+dashboard/style.css.backup
+dashboard_v2/index.html
+dashboard_v2/index.html.before-button-contrast
+dashboard_v2/index.html.before-button-fix
+dashboard_v2/index.html.before-code-studio
+dashboard_v2/index.html.before-console-runtime
+dashboard_v2/index.html.before-download-button
+dashboard_v2/index.html.before-files-workspace
+dashboard_v2/index.html.before-live-logs
+dashboard_v2/index.html.before_pyforge_manager
+dashboard_v2/index.html.before_startup_dashboard
+dashboard_v2/index.html.menu-fix-20261116_121853
+dashboard_v2/index.html.phase2-backup
+dashboard_v2/index.html.pre-auth-20261116_121336
+dashboard_v2/startup-dashboard.js
+dashboard_v2/startup-dashboard.js.backup
+dashboard_v2/startup-dashboard.js.before_pyforge_manager
+logs/api-server.log
+logs/backup-guardian-process.log
+logs/backup-guardian.log
+logs/boot-server.log
+logs/console/329bd8ed9a7f487ab61e7077d2ac5f6f.log
+logs/console/38291805c56345fd9d72ee4a6cdffdb3.log
+logs/console/54b4270fcf8843e4ac98e38a59631d4b.log
+logs/console/57f1948520014699a855ad5ed0b17f1a.log
+logs/console/775f636b389b4dfa80dec2c88a14fe8f.log
+logs/console/7fe80626afe64bb39e6a7c3d684bafd7.log
+logs/console/80d87d85a89f4cbea47984f1db7132de.log
+logs/console/8564d4693f9a4c7b82bfa76057a23292.log
+logs/console/8f76adb1d03f457095c81b5e4df029ee.log
+logs/console/99ad325ccb894016846c1f0fc12578e4.log
+logs/console/a4172f4ddacb439d86801127da39eb46.log
+logs/console/a7488dbae53547639e5b65d63119f85d.log
+logs/console/a93e70f9a8e54d11844cb6fad90911a4.log
+logs/console/aa330b6ff27c44b0b2ce163b3eeefe88.log
+logs/console/ab0f7032bbbe425a86895f91625768ec.log
+logs/console/b472ef0efa584d22a05b7fc871ed2413.log
+logs/console/c3abd6870cef4a4084b192719deb9bfe.log
+logs/console/c3bd2040afe44171a0b9e4f2d568461b.log
+logs/console/e17c3291ec20480b98b017594330685d.log
+logs/console/e74ec1bdcd994bc9b355424104da5656.log
+logs/console/ea13079e53ff4ce797541249bfc79be8.log
+logs/console/efbbc395ecd249dfb3ffc8560d496b40.log
+logs/console/f56fd64586044857b4cacf088fce0126.log
+logs/console/runs.json
+main.py
+main.py.before-code-studio
+main.py.before-console-runtime
+main.py.before-live-logs
+main.py.before_startup_integration
+main.py.phase2-backup
+main.py.phase3-before-create-endpoints
+main.py.syntax_error_backup
+monitoring/system_monitor.py
+projects/Vrotex Bot v1/README.md
+projects/Vrotex Bot v1/ko.py
+projects/Vrotex Bot v1/main.py
+projects/Vrotex Bot v1/me.py
+projects/file_manager.py
+projects/file_manager.py.phase3-backup
+projects/project_manager.py
+projects/project_manager.py.phase2-backup
+repair_files_studio.py
+runtime/backup-guardian.lock
+runtime/backup_guardian.py
+runtime/process_manager.py
+runtime/process_manager.py.before-live-logs
+runtime/pyforge-supervisor.lock/pid
+runtime/pyforge-supervisor.sh
+runtime/security.sqlite3
+runtime/startup_manager.py
+runtime/startup_manager.py.before_full_update
+runtime/test_startup_manager.py
+runtime/wake-lock-requested
+security_core/__init__.py
+security_core/auth.py
+security_core/middleware.py
+security_core/routes.py
+test-console-download.log
+
+=================================================================
+2. RUNNING PROCESSES
+=================================================================
+u0_a236  20320 31692  0  2022 pts/3    00:00:06 bash /data/data/com.termux/files/home/PyForge/runtime/pyforge-supervisor.sh
+u0_a236  20717 20320  0  2022 pts/3    00:00:00 python runtime/backup_guardian.py
+u0_a236  23479 20320  1  2022 pts/3    00:00:15 python -m uvicorn main:app --host 0.0.0.0 --port 8001
+
+=================================================================
+3. BACKEND STATUS
+=================================================================
+{"platform":"PyForge Cloud","version":"1.0.0","message":"PyForge Cloud backend is running."}
+
+=================================================================
+4. DASHBOARD STATUS
+=================================================================
+HTTP 200
+
+=================================================================
+5. PYTHON ENVIRONMENT
+=================================================================
+Python 3.14.10
+Package           Version
+----------------- -------
+anyio             4.16.0
+click             8.5.1
+fastapi           0.99.1
+h11               0.16.0
+idna              3.20
+pip               26.3
+pydantic          1.10.25
+starlette         0.27.0
+typing_extensions 4.16.0
+uvicorn           0.54.0
+
+=================================================================
+6. GIT STATUS
+=================================================================
+(No output)
+
+=================================================================
+7. RECENT LOG FILES
+=================================================================
+./logs/console/f56fd64586044857b4cacf088fce0126.log
+./logs/console/e74ec1bdcd994bc9b355424104da5656.log
+./logs/console/57f1948520014699a855ad5ed0b17f1a.log
+./logs/console/ea13079e53ff4ce797541249bfc79be8.log
+./logs/console/99ad325ccb894016846c1f0fc12578e4.log
+./logs/console/efbbc395ecd249dfb3ffc8560d496b40.log
+./logs/console/38291805c56345fd9d72ee4a6cdffdb3.log
+./logs/console/ab0f7032bbbe425a86895f91625768ec.log
+./logs/console/a93e70f9a8e54d11844cb6fad90911a4.log
+./logs/console/54b4270fcf8843e4ac98e38a59631d4b.log
+./logs/console/c3abd6870cef4a4084b192719deb9bfe.log
+./logs/console/e17c3291ec20480b98b017594330685d.log
+./logs/console/329bd8ed9a7f487ab61e7077d2ac5f6f.log
+./logs/console/aa330b6ff27c44b0b2ce163b3eeefe88.log
+./logs/console/8f76adb1d03f457095c81b5e4df029ee.log
+./logs/console/8564d4693f9a4c7b82bfa76057a23292.log
+./logs/console/a7488dbae53547639e5b65d63119f85d.log
+./logs/console/775f636b389b4dfa80dec2c88a14fe8f.log
+./logs/console/a4172f4ddacb439d86801127da39eb46.log
+./logs/console/c3bd2040afe44171a0b9e4f2d568461b.log
+./logs/console/b472ef0efa584d22a05b7fc871ed2413.log
+./logs/console/7fe80626afe64bb39e6a7c3d684bafd7.log
+./logs/console/80d87d85a89f4cbea47984f1db7132de.log
+./logs/boot-server.log
+./logs/backup-guardian-process.log
+./logs/backup-guardian.log
+./logs/api-server.log
+./test-console-download.log
+
+=================================================================
+LOG: test-console-download.log
+=================================================================
+[2026-11-15T12:59:49.877698+00:00] [INFO] ========================================
+[2026-11-15T12:59:49.878029+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T12:59:49.878235+00:00] [INFO] Project: PyForge Test Lab
+[2026-11-15T12:59:49.878329+00:00] [INFO] Run ID: f56fd64586044857b4cacf088fce0126
+[2026-11-15T12:59:49.878424+00:00] [INFO] Detecting project entry point...
+[2026-11-15T12:59:49.892392+00:00] [INFO] Detected entry point: main.py
+[2026-11-15T12:59:49.892604+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/PyForge Test Lab
+[2026-11-15T12:59:49.892764+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T12:59:49.892890+00:00] [INFO] Launching Python process...
+[2026-11-15T12:59:49.908215+00:00] [INFO] Process started successfully. PID=10493
+[2026-11-15T12:59:50.104169+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T12:59:50.138688+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.23 seconds.
+
+=================================================================
+LOG: logs/boot-server.log
+=================================================================
+nohup: ignoring input
+Supervisor started: Mon Nov 16 10:50:31 SAST 2026
+nohup: ignoring input
+Supervisor started: Mon Nov 16 11:24:30 SAST 2026
+Starting Backup Guardian: Mon Nov 16 11:24:30 SAST 2026
+Starting Backup Guardian: Mon Nov 16 11:24:45 SAST 2026
+Starting Backup Guardian: Mon Nov 16 11:25:00 SAST 2026
+Starting Backup Guardian: Mon Nov 16 11:25:15 SAST 2026
+Starting Backup Guardian: Mon Nov 16 11:25:31 SAST 2026
+Starting Backup Guardian: Mon Nov 16 11:25:46 SAST 2026
+Starting Backup Guardian: Mon Nov 16 11:26:01 SAST 2026
+Starting Backup Guardian: Mon Nov 16 11:26:16 SAST 2026
+Starting API: Mon Nov 16 12:08:15 SAST 2026
+[2026-11-16 13:18:57] PyForge supervisor started.
+[2026-11-16 13:19:02] Wake-lock request completed.
+[2026-11-16 13:20:08] Wake-lock request completed.
+[2026-11-16 13:21:17] Wake-lock request completed.
+Starting API: Mon Nov 16 14:00:54 SAST 2026
+
+=================================================================
+LOG: logs/backup-guardian-process.log
+=================================================================
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 76, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 76, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'
+Traceback (most recent call last):
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 76, in <module>
+    main()
+    ~~~~^^
+  File "/data/data/com.termux/files/home/PyForge/runtime/backup_guardian.py", line 40, in main
+    from backup_factory.engine import create_backup, verify_backup
+ModuleNotFoundError: No module named 'backup_factory'
+
+=================================================================
+LOG: logs/backup-guardian.log
+=================================================================
+[2026-11-16T09:26:17.769841+00:00] Backup Guardian started.
+[2026-11-16T09:26:17.770800+00:00] Automatic backup interval: 6 hours.
+[2026-11-16T09:26:17.771233+00:00] Existing backups will not be automatically deleted.
+
+=================================================================
+LOG: logs/api-server.log
+=================================================================
+INFO:     127.0.0.1:49880 - "GET /api/startup/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/monitoring/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49900 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35558 - "GET /api/startup/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35558 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35558 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35558 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/monitoring/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60370 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60354 - "GET /api/startup/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60354 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60354 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60354 - "GET /api/monitoring/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60380 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/startup/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49880 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60354 - "GET /api/monitoring/summary HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53248 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53234 - "GET /api/startup/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53234 - "GET /api/console/projects HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40668 - "GET / HTTP/1.1" 200 OK
+
+=================================================================
+LOG: logs/console/f56fd64586044857b4cacf088fce0126.log
+=================================================================
+[2026-11-15T12:59:49.877698+00:00] [INFO] ========================================
+[2026-11-15T12:59:49.878029+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T12:59:49.878235+00:00] [INFO] Project: PyForge Test Lab
+[2026-11-15T12:59:49.878329+00:00] [INFO] Run ID: f56fd64586044857b4cacf088fce0126
+[2026-11-15T12:59:49.878424+00:00] [INFO] Detecting project entry point...
+[2026-11-15T12:59:49.892392+00:00] [INFO] Detected entry point: main.py
+[2026-11-15T12:59:49.892604+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/PyForge Test Lab
+[2026-11-15T12:59:49.892764+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T12:59:49.892890+00:00] [INFO] Launching Python process...
+[2026-11-15T12:59:49.908215+00:00] [INFO] Process started successfully. PID=10493
+[2026-11-15T12:59:50.104169+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T12:59:50.138688+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.23 seconds.
+
+=================================================================
+LOG: logs/console/e74ec1bdcd994bc9b355424104da5656.log
+=================================================================
+[2026-11-15T13:01:59.177450+00:00] [INFO] ========================================
+[2026-11-15T13:01:59.178097+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:01:59.178302+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:01:59.178579+00:00] [INFO] Run ID: e74ec1bdcd994bc9b355424104da5656
+[2026-11-15T13:01:59.178717+00:00] [INFO] Detecting project entry point...
+[2026-11-15T13:01:59.185290+00:00] [ERROR] STARTUP FAILED: FileNotFoundError: Python file not found: Main.py
+[2026-11-15T13:01:59.185497+00:00] [ERROR] See this log for the startup diagnostic.
+
+=================================================================
+LOG: logs/console/57f1948520014699a855ad5ed0b17f1a.log
+=================================================================
+[2026-11-15T13:02:53.115451+00:00] [INFO] ========================================
+[2026-11-15T13:02:53.115674+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:02:53.116022+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:02:53.116136+00:00] [INFO] Run ID: 57f1948520014699a855ad5ed0b17f1a
+[2026-11-15T13:02:53.116263+00:00] [INFO] Detecting project entry point...
+[2026-11-15T13:02:53.122296+00:00] [ERROR] STARTUP FAILED: FileNotFoundError: Python file not found: Main.py
+[2026-11-15T13:02:53.122504+00:00] [ERROR] See this log for the startup diagnostic.
+
+=================================================================
+LOG: logs/console/ea13079e53ff4ce797541249bfc79be8.log
+=================================================================
+[2026-11-15T13:02:56.769928+00:00] [INFO] ========================================
+[2026-11-15T13:02:56.770129+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:02:56.770199+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:02:56.770266+00:00] [INFO] Run ID: ea13079e53ff4ce797541249bfc79be8
+[2026-11-15T13:02:56.770325+00:00] [INFO] Detecting project entry point...
+[2026-11-15T13:02:56.774205+00:00] [ERROR] STARTUP FAILED: FileNotFoundError: Python file not found: Main.py
+[2026-11-15T13:02:56.774427+00:00] [ERROR] See this log for the startup diagnostic.
+
+=================================================================
+LOG: logs/console/99ad325ccb894016846c1f0fc12578e4.log
+=================================================================
+[2026-11-15T13:02:58.130130+00:00] [INFO] ========================================
+[2026-11-15T13:02:58.130871+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:02:58.131424+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:02:58.131662+00:00] [INFO] Run ID: 99ad325ccb894016846c1f0fc12578e4
+[2026-11-15T13:02:58.131824+00:00] [INFO] Detecting project entry point...
+[2026-11-15T13:02:58.138052+00:00] [ERROR] STARTUP FAILED: FileNotFoundError: Python file not found: Main.py
+[2026-11-15T13:02:58.138225+00:00] [ERROR] See this log for the startup diagnostic.
+
+=================================================================
+LOG: logs/console/efbbc395ecd249dfb3ffc8560d496b40.log
+=================================================================
+[2026-11-15T13:02:59.337397+00:00] [INFO] ========================================
+[2026-11-15T13:02:59.337567+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:02:59.337750+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:02:59.337856+00:00] [INFO] Run ID: efbbc395ecd249dfb3ffc8560d496b40
+[2026-11-15T13:02:59.337959+00:00] [INFO] Detecting project entry point...
+[2026-11-15T13:02:59.340704+00:00] [ERROR] STARTUP FAILED: FileNotFoundError: Python file not found: Main.py
+[2026-11-15T13:02:59.340820+00:00] [ERROR] See this log for the startup diagnostic.
+
+=================================================================
+LOG: logs/console/38291805c56345fd9d72ee4a6cdffdb3.log
+=================================================================
+[2026-11-15T13:04:53.059246+00:00] [INFO] ========================================
+[2026-11-15T13:04:53.059637+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:04:53.059796+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:04:53.059968+00:00] [INFO] Run ID: 38291805c56345fd9d72ee4a6cdffdb3
+[2026-11-15T13:04:53.060045+00:00] [INFO] Detecting project entry point...
+[2026-11-15T13:04:53.071710+00:00] [INFO] Detected entry point: main.py
+[2026-11-15T13:04:53.072002+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/Vrotex Bot v1
+[2026-11-15T13:04:53.072147+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T13:04:53.072275+00:00] [INFO] Launching Python process...
+[2026-11-15T13:04:53.085759+00:00] [INFO] Process started successfully. PID=11138
+[2026-11-15T13:04:53.286534+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T13:04:53.328761+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.24 seconds.
+
+=================================================================
+LOG: logs/console/ab0f7032bbbe425a86895f91625768ec.log
+=================================================================
+[2026-11-15T13:15:40.202296+00:00] [INFO] ========================================
+[2026-11-15T13:15:40.202582+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:15:40.202708+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:15:40.202771+00:00] [INFO] Run ID: ab0f7032bbbe425a86895f91625768ec
+[2026-11-15T13:15:40.202827+00:00] [INFO] Detecting project entry point...
+[2026-11-15T13:15:40.220487+00:00] [INFO] Detected entry point: main.py
+[2026-11-15T13:15:40.220830+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/Vrotex Bot v1
+[2026-11-15T13:15:40.221060+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T13:15:40.221222+00:00] [INFO] Launching Python process...
+[2026-11-15T13:15:40.262050+00:00] [INFO] Process started successfully. PID=16061
+[2026-11-15T13:15:40.819552+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T13:15:40.890360+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.63 seconds.
+
+=================================================================
+LOG: logs/console/a93e70f9a8e54d11844cb6fad90911a4.log
+=================================================================
+[2026-11-15T13:15:49.446635+00:00] [INFO] ========================================
+[2026-11-15T13:15:49.446931+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:15:49.447061+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:15:49.447168+00:00] [INFO] Run ID: a93e70f9a8e54d11844cb6fad90911a4
+[2026-11-15T13:15:49.447246+00:00] [INFO] Detecting project entry point...
+[2026-11-15T13:15:49.459327+00:00] [INFO] Detected entry point: main.py
+[2026-11-15T13:15:49.459788+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/Vrotex Bot v1
+[2026-11-15T13:15:49.459917+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T13:15:49.460060+00:00] [INFO] Launching Python process...
+[2026-11-15T13:15:49.466605+00:00] [INFO] Process started successfully. PID=16090
+[2026-11-15T13:15:49.624025+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T13:15:49.662258+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.2 seconds.
+
+=================================================================
+LOG: logs/console/54b4270fcf8843e4ac98e38a59631d4b.log
+=================================================================
+[2026-11-15T13:15:51.082150+00:00] [INFO] ========================================
+[2026-11-15T13:15:51.082343+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:15:51.082465+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:15:51.082538+00:00] [INFO] Run ID: 54b4270fcf8843e4ac98e38a59631d4b
+[2026-11-15T13:15:51.082602+00:00] [INFO] Detecting project entry point...
+[2026-11-15T13:15:51.085171+00:00] [INFO] Detected entry point: main.py
+[2026-11-15T13:15:51.085359+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/Vrotex Bot v1
+[2026-11-15T13:15:51.085447+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T13:15:51.085524+00:00] [INFO] Launching Python process...
+[2026-11-15T13:15:51.088494+00:00] [INFO] Process started successfully. PID=16092
+[2026-11-15T13:15:51.218036+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T13:15:51.259154+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.17 seconds.
+
+=================================================================
+LOG: logs/console/c3abd6870cef4a4084b192719deb9bfe.log
+=================================================================
+[2026-11-15T13:16:14.760237+00:00] [INFO] ========================================
+[2026-11-15T13:16:14.760508+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:16:14.760609+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:16:14.760688+00:00] [INFO] Run ID: c3abd6870cef4a4084b192719deb9bfe
+[2026-11-15T13:16:14.760785+00:00] [INFO] Detecting project entry point...
+[2026-11-15T13:16:14.764508+00:00] [INFO] Detected entry point: main.py
+[2026-11-15T13:16:14.764698+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/Vrotex Bot v1
+[2026-11-15T13:16:14.764812+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T13:16:14.764892+00:00] [INFO] Launching Python process...
+[2026-11-15T13:16:14.774889+00:00] [INFO] Process started successfully. PID=16127
+[2026-11-15T13:16:15.073728+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T13:16:15.112181+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.34 seconds.
+
+=================================================================
+LOG: logs/console/e17c3291ec20480b98b017594330685d.log
+=================================================================
+[2026-11-15T13:16:30.567384+00:00] [INFO] ========================================
+[2026-11-15T13:16:30.567704+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:16:30.567826+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:16:30.567890+00:00] [INFO] Run ID: e17c3291ec20480b98b017594330685d
+[2026-11-15T13:16:30.567944+00:00] [INFO] Detecting project entry point...
+[2026-11-15T13:16:30.592139+00:00] [INFO] Detected entry point: main.py
+[2026-11-15T13:16:30.592339+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/Vrotex Bot v1
+[2026-11-15T13:16:30.592650+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T13:16:30.592735+00:00] [INFO] Launching Python process...
+[2026-11-15T13:16:30.624445+00:00] [INFO] Process started successfully. PID=16557
+[2026-11-15T13:16:30.989445+00:00] [OUTPUT] Hello from PyForge Cloud!
+
+=================================================================
+LOG: logs/console/329bd8ed9a7f487ab61e7077d2ac5f6f.log
+=================================================================
+[2026-11-15T13:16:34.994676+00:00] [INFO] ========================================
+[2026-11-15T13:16:34.994846+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:16:34.994965+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:16:34.995025+00:00] [INFO] Run ID: 329bd8ed9a7f487ab61e7077d2ac5f6f
+[2026-11-15T13:16:34.995078+00:00] [INFO] Detecting project entry point...
+[2026-11-15T13:16:34.997411+00:00] [INFO] Detected entry point: main.py
+[2026-11-15T13:16:35.001855+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/Vrotex Bot v1
+[2026-11-15T13:16:35.002011+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T13:16:35.002097+00:00] [INFO] Launching Python process...
+[2026-11-15T13:16:35.014239+00:00] [INFO] Process started successfully. PID=16598
+[2026-11-15T13:16:35.214347+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T13:16:35.266984+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.25 seconds.
+
+=================================================================
+LOG: logs/console/aa330b6ff27c44b0b2ce163b3eeefe88.log
+=================================================================
+[2026-11-15T13:16:36.597671+00:00] [INFO] ========================================
+[2026-11-15T13:16:36.598018+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:16:36.598127+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:16:36.598191+00:00] [INFO] Run ID: aa330b6ff27c44b0b2ce163b3eeefe88
+[2026-11-15T13:16:36.598250+00:00] [INFO] Detecting project entry point...
+[2026-11-15T13:16:36.600809+00:00] [INFO] Detected entry point: main.py
+[2026-11-15T13:16:36.600980+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/Vrotex Bot v1
+[2026-11-15T13:16:36.601063+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T13:16:36.601121+00:00] [INFO] Launching Python process...
+[2026-11-15T13:16:36.606182+00:00] [INFO] Process started successfully. PID=16623
+[2026-11-15T13:16:36.749987+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T13:16:36.791042+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.18 seconds.
+
+=================================================================
+LOG: logs/console/8f76adb1d03f457095c81b5e4df029ee.log
+=================================================================
+[2026-11-15T13:49:27.562668+00:00] [INFO] ========================================
+[2026-11-15T13:49:27.563028+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:49:27.563248+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:49:27.563363+00:00] [INFO] Run ID: 8f76adb1d03f457095c81b5e4df029ee
+[2026-11-15T13:49:27.563466+00:00] [INFO] Entry point: main.py
+[2026-11-15T13:49:27.563608+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/Vrotex Bot v1
+[2026-11-15T13:49:27.563858+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T13:49:27.564033+00:00] [INFO] Launching Python process...
+[2026-11-15T13:49:27.580725+00:00] [INFO] Process started successfully. PID=29163
+[2026-11-15T13:49:27.779893+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T13:49:27.819465+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.24 seconds.
+
+=================================================================
+LOG: logs/console/8564d4693f9a4c7b82bfa76057a23292.log
+=================================================================
+[2026-11-15T13:49:37.616628+00:00] [INFO] ========================================
+[2026-11-15T13:49:37.616903+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:49:37.617091+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:49:37.617287+00:00] [INFO] Run ID: 8564d4693f9a4c7b82bfa76057a23292
+[2026-11-15T13:49:37.617468+00:00] [INFO] Entry point: main.py
+[2026-11-15T13:49:37.617646+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/Vrotex Bot v1
+[2026-11-15T13:49:37.617813+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T13:49:37.617910+00:00] [INFO] Launching Python process...
+[2026-11-15T13:49:37.621683+00:00] [INFO] Process started successfully. PID=29167
+[2026-11-15T13:49:37.755908+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T13:49:37.793412+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.17 seconds.
+
+=================================================================
+LOG: logs/console/a7488dbae53547639e5b65d63119f85d.log
+=================================================================
+[2026-11-15T13:52:17.855730+00:00] [INFO] ========================================
+[2026-11-15T13:52:17.856178+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:52:17.856313+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:52:17.856449+00:00] [INFO] Run ID: a7488dbae53547639e5b65d63119f85d
+[2026-11-15T13:52:17.856530+00:00] [INFO] Entry point: main.py
+[2026-11-15T13:52:17.856634+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/Vrotex Bot v1
+[2026-11-15T13:52:17.856731+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T13:52:17.856839+00:00] [INFO] Launching Python process...
+[2026-11-15T13:52:17.869333+00:00] [INFO] Process started successfully. PID=30212
+[2026-11-15T13:52:18.086513+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T13:52:18.124114+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.25 seconds.
+
+=================================================================
+LOG: logs/console/775f636b389b4dfa80dec2c88a14fe8f.log
+=================================================================
+[2026-11-15T13:53:25.856583+00:00] [INFO] ========================================
+[2026-11-15T13:53:25.856928+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T13:53:25.857105+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T13:53:25.857231+00:00] [INFO] Run ID: 775f636b389b4dfa80dec2c88a14fe8f
+[2026-11-15T13:53:25.857319+00:00] [INFO] Entry point: main.py
+[2026-11-15T13:53:25.857413+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/Vrotex Bot v1
+[2026-11-15T13:53:25.857508+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T13:53:25.857617+00:00] [INFO] Launching Python process...
+[2026-11-15T13:53:25.865395+00:00] [INFO] Process started successfully. PID=30424
+[2026-11-15T13:53:26.123360+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T13:53:26.162180+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.3 seconds.
+
+=================================================================
+LOG: logs/console/a4172f4ddacb439d86801127da39eb46.log
+=================================================================
+[2026-11-15T16:13:04.681308+00:00] [INFO] ========================================
+[2026-11-15T16:13:04.681564+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T16:13:04.681743+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-15T16:13:04.681945+00:00] [INFO] Run ID: a4172f4ddacb439d86801127da39eb46
+[2026-11-15T16:13:04.682033+00:00] [INFO] Entry point: main.py
+[2026-11-15T16:13:04.682139+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/Vrotex Bot v1
+[2026-11-15T16:13:04.682236+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T16:13:04.682317+00:00] [INFO] Launching Python process...
+[2026-11-15T16:13:04.691310+00:00] [INFO] Process started successfully. PID=13224
+[2026-11-15T16:13:04.839843+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T16:13:04.879060+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.19 seconds.
+
+=================================================================
+LOG: logs/console/c3bd2040afe44171a0b9e4f2d568461b.log
+=================================================================
+[2026-11-15T16:31:49.002988+00:00] [INFO] ========================================
+[2026-11-15T16:31:49.003309+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T16:31:49.003410+00:00] [INFO] Project: PyForge Test Lab
+[2026-11-15T16:31:49.003472+00:00] [INFO] Run ID: c3bd2040afe44171a0b9e4f2d568461b
+[2026-11-15T16:31:49.003529+00:00] [INFO] Entry point: main.py
+[2026-11-15T16:31:49.003602+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/PyForge Test Lab
+[2026-11-15T16:31:49.003669+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T16:31:49.008363+00:00] [INFO] Launching Python process...
+[2026-11-15T16:31:49.030560+00:00] [INFO] Process started successfully. PID=21257
+[2026-11-15T16:31:49.326665+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T16:31:49.371682+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.34 seconds.
+
+=================================================================
+LOG: logs/console/b472ef0efa584d22a05b7fc871ed2413.log
+=================================================================
+[2026-11-15T16:31:54.631090+00:00] [INFO] ========================================
+[2026-11-15T16:31:54.631330+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-15T16:31:54.631472+00:00] [INFO] Project: PyForge Test Lab
+[2026-11-15T16:31:54.631568+00:00] [INFO] Run ID: b472ef0efa584d22a05b7fc871ed2413
+[2026-11-15T16:31:54.631839+00:00] [INFO] Entry point: main.py
+[2026-11-15T16:31:54.631972+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/PyForge Test Lab
+[2026-11-15T16:31:54.632073+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-15T16:31:54.632167+00:00] [INFO] Launching Python process...
+[2026-11-15T16:31:54.636114+00:00] [INFO] Process started successfully. PID=21307
+[2026-11-15T16:31:54.784606+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-15T16:31:54.822337+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.19 seconds.
+
+=================================================================
+LOG: logs/console/7fe80626afe64bb39e6a7c3d684bafd7.log
+=================================================================
+[2026-11-16T08:57:41.188609+00:00] [INFO] ========================================
+[2026-11-16T08:57:41.188943+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-16T08:57:41.189088+00:00] [INFO] Project: PyForge Test Lab
+[2026-11-16T08:57:41.189271+00:00] [INFO] Run ID: 7fe80626afe64bb39e6a7c3d684bafd7
+[2026-11-16T08:57:41.189367+00:00] [INFO] Entry point: main.py
+[2026-11-16T08:57:41.189490+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/PyForge Test Lab
+[2026-11-16T08:57:41.189600+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-16T08:57:41.189893+00:00] [INFO] Launching Python process...
+[2026-11-16T08:57:41.203436+00:00] [INFO] Process started successfully. PID=9902
+[2026-11-16T08:57:41.405535+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-16T08:57:41.443856+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.24 seconds.
+
+=================================================================
+LOG: logs/console/80d87d85a89f4cbea47984f1db7132de.log
+=================================================================
+[2026-11-16T11:14:06.766508+00:00] [INFO] ========================================
+[2026-11-16T11:14:06.766844+00:00] [INFO] PYFORGE PROJECT START REQUESTED
+[2026-11-16T11:14:06.766993+00:00] [INFO] Project: Vrotex Bot v1
+[2026-11-16T11:14:06.767111+00:00] [INFO] Run ID: 80d87d85a89f4cbea47984f1db7132de
+[2026-11-16T11:14:06.767224+00:00] [INFO] Entry point: main.py
+[2026-11-16T11:14:06.767359+00:00] [INFO] Working directory: /data/data/com.termux/files/home/PyForge/projects/Vrotex Bot v1
+[2026-11-16T11:14:06.767494+00:00] [INFO] Python executable: /data/data/com.termux/files/usr/bin/python
+[2026-11-16T11:14:06.767663+00:00] [INFO] Launching Python process...
+[2026-11-16T11:14:06.780195+00:00] [INFO] Process started successfully. PID=32718
+[2026-11-16T11:14:06.997556+00:00] [OUTPUT] Hello from PyForge Cloud!
+[2026-11-16T11:14:07.042319+00:00] [INFO] Process ended. Status=stopped; exit code=0; runtime=0.26 seconds.
+
+=================================================================
+8. MODULE AND FUNCTION INVENTORY
+=================================================================
+./monitoring/system_monitor.py:14:def read_memory():
+./monitoring/system_monitor.py:43:def read_cpu():
+./monitoring/system_monitor.py:86:def read_storage():
+./monitoring/system_monitor.py:103:def get_system_summary(projects):
+./backup_factory/engine.py:25:def _excluded(path):
+./backup_factory/engine.py:38:def create_backup():
+./backup_factory/engine.py:116:def list_backups():
+./backup_factory/engine.py:136:def verify_backup(filename):
+./backup_factory/engine.py:176:def restore_backup(filename=None, confirm=False):
+./projects/project_manager.py:15:def validate_name(name):
+./projects/project_manager.py:30:def safe_project_path(name):
+./projects/project_manager.py:40:def list_projects():
+./projects/project_manager.py:60:def create_project(name):
+./projects/project_manager.py:84:def get_project(name):
+./projects/project_manager.py:109:def rename_project(old_name, new_name):
+./projects/project_manager.py:123:def delete_project(name, confirm=False):
+./projects/Vrotex Bot v1/main.py:1:def main():
+./projects/file_manager.py:11:def project_root(name):
+./projects/file_manager.py:32:def safe_file_path(name, relative_path):
+./projects/file_manager.py:65:def validate_new_name(name):
+./projects/file_manager.py:87:def list_files(name, directory=""):
+./projects/file_manager.py:120:def read_file(name, relative_path):
+./projects/file_manager.py:141:def create_file(name, relative_path, content=""):
+./projects/file_manager.py:166:def create_folder(name, relative_path):
+./projects/file_manager.py:184:def save_file(name, relative_path, content):
+./projects/file_manager.py:239:def rename_item(name, relative_path, new_name):
+./projects/file_manager.py:262:def duplicate_file(name, relative_path, new_name):
+./projects/file_manager.py:281:def _check_deletable_tree(folder):
+./projects/file_manager.py:291:def delete_item(name, relative_path):
+./projects/file_manager.py:309:def create_project_zip(name):
+./runtime/process_manager.py:27:def _now():
+./runtime/process_manager.py:31:def _save_index_locked():
+./runtime/process_manager.py:50:def _load_index():
+./runtime/process_manager.py:80:def _resolve_entrypoint(project, script=None):
+./runtime/process_manager.py:115:def _write_locked(record, message, level="INFO"):
+./runtime/process_manager.py:130:def _refresh_record_locked(record):
+./runtime/process_manager.py:165:def _snapshot_locked(record):
+./runtime/process_manager.py:189:def _latest_for_project_locked(project):
+./runtime/process_manager.py:199:def _read_output(process, run_id):
+./runtime/process_manager.py:226:def start_process(project, script=None):
+./runtime/process_manager.py:311:def stop_process(project):
+./runtime/process_manager.py:360:def restart_process(project, script=None):
+./runtime/process_manager.py:365:def get_status(project=None):
+./runtime/process_manager.py:387:def get_project_statuses(projects):
+./runtime/process_manager.py:406:def get_run_history(project):
+./runtime/process_manager.py:416:def get_log_file(run_id):
+./runtime/backup_guardian.py:23:def log(message):
+./runtime/backup_guardian.py:30:def main():
+./runtime/startup_manager.py:25:def now():
+./runtime/startup_manager.py:29:def record_event(message):
+./runtime/startup_manager.py:42:def get_pids(pattern):
+./runtime/startup_manager.py:60:def check_url(url):
+./runtime/startup_manager.py:73:def service_status(name, pattern, url=None):
+./runtime/startup_manager.py:88:def get_recent_events():
+./runtime/startup_manager.py:94:def startup_status():
+./runtime/startup_manager.py:131:def stop_service(service):
+./runtime/startup_manager.py:151:def restart_service(service: str):
+./runtime/startup_manager.py:181:def request_wake_lock():
+./runtime/test_startup_manager.py:16:def test(name, condition, detail=""):
+./runtime/test_startup_manager.py:30:def request(url, method="GET"):
+./main.py:66:class ProjectCreateRequest(BaseModel):
+./main.py:70:class ProjectRenameRequest(BaseModel):
+./main.py:74:class ProjectDeleteRequest(BaseModel):
+./main.py:78:class FileSaveRequest(BaseModel):
+./main.py:83:class FileCreateRequest(BaseModel):
+./main.py:88:class FolderCreateRequest(BaseModel):
+./main.py:92:class FileItemRenameRequest(BaseModel):
+./main.py:97:class FileItemPathRequest(BaseModel):
+./main.py:102:def home():
+./main.py:111:def health():
+./main.py:120:def projects():
+./main.py:126:def create_new_project(request: ProjectCreateRequest):
+./main.py:136:def project_details(name: str):
+./main.py:149:def project_files(name: str, directory: str = ""):
+./main.py:159:def open_project_file(name: str, path: str):
+./main.py:169:def create_project_file(name: str, request: FileCreateRequest):
+./main.py:181:def create_project_folder(name: str, request: FolderCreateRequest):
+./main.py:193:def save_project_file(name: str, request: FileSaveRequest):
+./main.py:222:def rename_project_item(name: str, request: FileItemRenameRequest):
+./main.py:234:def duplicate_project_file(name: str, request: FileItemRenameRequest):
+./main.py:246:def delete_project_item(name: str, request: FileItemPathRequest):
+./main.py:256:def download_project_file(name: str, path: str):
+./main.py:275:def download_project_archive(name: str):
+./main.py:292:def rename_existing_project(name: str, request: ProjectRenameRequest):
+./main.py:307:def delete_existing_project(name: str, request: ProjectDeleteRequest):
+./main.py:337:class ConsoleRunRequest(BaseModel):
+./main.py:342:class ConsoleProjectRequest(BaseModel):
+./main.py:347:def console_projects():
+./main.py:354:def console_status():
+./main.py:359:def console_project_status(project: str):
+./main.py:364:def console_project_history(project: str):
+./main.py:372:def console_start(request: ConsoleRunRequest):
+./main.py:384:def console_restart(request: ConsoleRunRequest):
+./main.py:396:def console_stop(request: ConsoleProjectRequest):
+./main.py:401:def console_download_log(run_id: str):
+./main.py:419:def monitoring_summary():
+./main.py:433:def create_full_backup():
+./main.py:444:def get_full_backups():
+./main.py:449:def verify_full_backup(filename: str):
+./main.py:461:def restore_full_backup(filename: str = None, confirm: bool = False):
+./backups/pre_multibot/process_manager.py:39:def _now():
+./backups/pre_multibot/process_manager.py:43:def _write_locked(message, level="INFO", handle=None, run_id=None):
+./backups/pre_multibot/process_manager.py:61:def _resolve_entrypoint(project, script=None):
+./backups/pre_multibot/process_manager.py:96:def _refresh_locked():
+./backups/pre_multibot/process_manager.py:124:def _snapshot_locked():
+./backups/pre_multibot/process_manager.py:146:def _read_output(process, run_id, handle):
+./backups/pre_multibot/process_manager.py:167:def get_status():
+./backups/pre_multibot/process_manager.py:172:def start_process(project, script=None):
+./backups/pre_multibot/process_manager.py:259:def stop_process():
+./backups/pre_multibot/process_manager.py:297:def restart_process(project, script=None):
+./backups/pre_multibot/process_manager.py:302:def get_log_file(run_id):
+./backups/pre_multibot/main.py:41:class ProjectCreateRequest(BaseModel):
+./backups/pre_multibot/main.py:45:class ProjectRenameRequest(BaseModel):
+./backups/pre_multibot/main.py:49:class ProjectDeleteRequest(BaseModel):
+./backups/pre_multibot/main.py:53:class FileSaveRequest(BaseModel):
+./backups/pre_multibot/main.py:58:class FileCreateRequest(BaseModel):
+./backups/pre_multibot/main.py:63:class FolderCreateRequest(BaseModel):
+./backups/pre_multibot/main.py:68:def home():
+./backups/pre_multibot/main.py:77:def health():
+./backups/pre_multibot/main.py:86:def projects():
+./backups/pre_multibot/main.py:92:def create_new_project(request: ProjectCreateRequest):
+./backups/pre_multibot/main.py:102:def project_details(name: str):
+./backups/pre_multibot/main.py:115:def project_files(name: str, directory: str = ""):
+./backups/pre_multibot/main.py:125:def open_project_file(name: str, path: str):
+./backups/pre_multibot/main.py:135:def create_project_file(name: str, request: FileCreateRequest):
+./backups/pre_multibot/main.py:147:def create_project_folder(name: str, request: FolderCreateRequest):
+./backups/pre_multibot/main.py:159:def save_project_file(name: str, request: FileSaveRequest):
+./backups/pre_multibot/main.py:169:def rename_existing_project(name: str, request: ProjectRenameRequest):
+./backups/pre_multibot/main.py:184:def delete_existing_project(name: str, request: ProjectDeleteRequest):
+./backups/pre_multibot/main.py:211:class ConsoleRunRequest(BaseModel):
+./backups/pre_multibot/main.py:217:def console_status():
+./backups/pre_multibot/main.py:222:def console_start(request: ConsoleRunRequest):
+./backups/pre_multibot/main.py:230:def console_restart(request: ConsoleRunRequest):
+./backups/pre_multibot/main.py:238:def console_stop():
+./backups/pre_multibot/main.py:243:def console_download_log(run_id: str):
+./backups/checkpoints/main-20261115-174636.py:45:class ProjectCreateRequest(BaseModel):
+./backups/checkpoints/main-20261115-174636.py:49:class ProjectRenameRequest(BaseModel):
+./backups/checkpoints/main-20261115-174636.py:53:class ProjectDeleteRequest(BaseModel):
+./backups/checkpoints/main-20261115-174636.py:57:class FileSaveRequest(BaseModel):
+./backups/checkpoints/main-20261115-174636.py:62:class FileCreateRequest(BaseModel):
+./backups/checkpoints/main-20261115-174636.py:67:class FolderCreateRequest(BaseModel):
+./backups/checkpoints/main-20261115-174636.py:71:class FileItemRenameRequest(BaseModel):
+./backups/checkpoints/main-20261115-174636.py:76:class FileItemPathRequest(BaseModel):
+./backups/checkpoints/main-20261115-174636.py:81:def home():
+./backups/checkpoints/main-20261115-174636.py:90:def health():
+./backups/checkpoints/main-20261115-174636.py:99:def projects():
+./backups/checkpoints/main-20261115-174636.py:105:def create_new_project(request: ProjectCreateRequest):
+./backups/checkpoints/main-20261115-174636.py:115:def project_details(name: str):
+./backups/checkpoints/main-20261115-174636.py:128:def project_files(name: str, directory: str = ""):
+./backups/checkpoints/main-20261115-174636.py:138:def open_project_file(name: str, path: str):
+./backups/checkpoints/main-20261115-174636.py:148:def create_project_file(name: str, request: FileCreateRequest):
+./backups/checkpoints/main-20261115-174636.py:160:def create_project_folder(name: str, request: FolderCreateRequest):
+./backups/checkpoints/main-20261115-174636.py:172:def save_project_file(name: str, request: FileSaveRequest):
+./backups/checkpoints/main-20261115-174636.py:185:def rename_project_item(name: str, request: FileItemRenameRequest):
+./backups/checkpoints/main-20261115-174636.py:197:def duplicate_project_file(name: str, request: FileItemRenameRequest):
+./backups/checkpoints/main-20261115-174636.py:209:def delete_project_item(name: str, request: FileItemPathRequest):
+./backups/checkpoints/main-20261115-174636.py:219:def download_project_file(name: str, path: str):
+./backups/checkpoints/main-20261115-174636.py:238:def download_project_archive(name: str):
+./backups/checkpoints/main-20261115-174636.py:255:def rename_existing_project(name: str, request: ProjectRenameRequest):
+./backups/checkpoints/main-20261115-174636.py:270:def delete_existing_project(name: str, request: ProjectDeleteRequest):
+./backups/checkpoints/main-20261115-174636.py:300:class ConsoleRunRequest(BaseModel):
+./backups/checkpoints/main-20261115-174636.py:305:class ConsoleProjectRequest(BaseModel):
+./backups/checkpoints/main-20261115-174636.py:310:def console_projects():
+./backups/checkpoints/main-20261115-174636.py:317:def console_status():
+./backups/checkpoints/main-20261115-174636.py:322:def console_project_status(project: str):
+./backups/checkpoints/main-20261115-174636.py:327:def console_project_history(project: str):
+./backups/checkpoints/main-20261115-174636.py:335:def console_start(request: ConsoleRunRequest):
+./backups/checkpoints/main-20261115-174636.py:347:def console_restart(request: ConsoleRunRequest):
+./backups/checkpoints/main-20261115-174636.py:359:def console_stop(request: ConsoleProjectRequest):
+./backups/checkpoints/main-20261115-174636.py:364:def console_download_log(run_id: str):
+./backups/checkpoints/main-20261115-174636.py:382:def monitoring_summary():
+./backups/checkpoints/file-manager-20261115-174636.py:11:def project_root(name):
+./backups/checkpoints/file-manager-20261115-174636.py:32:def safe_file_path(name, relative_path):
+./backups/checkpoints/file-manager-20261115-174636.py:65:def validate_new_name(name):
+./backups/checkpoints/file-manager-20261115-174636.py:87:def list_files(name, directory=""):
+./backups/checkpoints/file-manager-20261115-174636.py:120:def read_file(name, relative_path):
+./backups/checkpoints/file-manager-20261115-174636.py:141:def create_file(name, relative_path, content=""):
+./backups/checkpoints/file-manager-20261115-174636.py:166:def create_folder(name, relative_path):
+./backups/checkpoints/file-manager-20261115-174636.py:184:def save_file(name, relative_path, content):
+./backups/checkpoints/file-manager-20261115-174636.py:239:def rename_item(name, relative_path, new_name):
+./backups/checkpoints/file-manager-20261115-174636.py:262:def duplicate_file(name, relative_path, new_name):
+./backups/checkpoints/file-manager-20261115-174636.py:281:def _check_deletable_tree(folder):
+./backups/checkpoints/file-manager-20261115-174636.py:291:def delete_item(name, relative_path):
+./backups/checkpoints/file-manager-20261115-174636.py:309:def create_project_zip(name):
+./security_core/auth.py:20:def _connect():
+./security_core/auth.py:27:def _secure_permissions():
+./security_core/auth.py:38:def initialize():
+./security_core/auth.py:80:def _password_hash(password, salt):
+./security_core/auth.py:92:def owner_exists():
+./security_core/auth.py:100:def create_owner(password, username="owner"):
+./security_core/auth.py:131:def _record_failure(client_key):
+./security_core/auth.py:160:def _is_blocked(client_key):
+./security_core/auth.py:172:def _clear_failures(client_key):
+./security_core/auth.py:180:def audit(event, username=None, client_key=None, detail=None):
+./security_core/auth.py:202:def login(username, password, client_key="local"):
+./security_core/auth.py:266:def validate_session(token, csrf_token=None, require_csrf=False):
+./security_core/auth.py:309:def logout(token, client_key="unknown"):
+./security_core/auth.py:330:def get_audit_events(limit=100):
+./security_core/auth.py:344:def cleanup_expired_sessions():
+./security_core/middleware.py:17:class SecurityMiddleware(BaseHTTPMiddleware):
+./security_core/routes.py:10:class LoginRequest(BaseModel):
+./security_core/routes.py:15:def client_key(request):
+./security_core/routes.py:22:def security_status():
+./security_core/routes.py:30:def owner_login(data: LoginRequest, request: Request, response: Response):
+./security_core/routes.py:63:def current_owner(request: Request):
+./security_core/routes.py:77:def owner_logout(request: Request, response: Response):

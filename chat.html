@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#080808">
+<title>PyForge Coding Assistant</title>
+
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+
+<style>
+:root {
+    color-scheme: dark;
+    --bg: #080808;
+    --panel: #171717;
+    --panel2: #222222;
+    --border: #303030;
+    --text: #eeeeee;
+    --muted: #999999;
+    --accent: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont,
+                 "Segoe UI", sans-serif;
+}
+
+button, textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+}
+
+/* HEADER */
+
+.header {
+    height: 58px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    border-bottom: 1px solid var(--border);
+    background: #080808;
+    z-index: 5;
+}
+
+.header-left, .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.brand {
+    font-size: 16px;
+    font-weight: 650;
+    letter-spacing: .1px;
+}
+
+.icon-button {
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: white;
+    font-size: 21px;
+    display: grid;
+    place-items: center;
+}
+
+.icon-button:active {
+    background: var(--panel2);
+}
+
+/* CONVERSATION */
+
+.conversation {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 22px 15px 30px;
+    scroll-behavior: smooth;
+}
+
+.messages {
+    width: 100%;
+    max-width: 820px;
+    margin: 0 auto;
+}
+
+.welcome {
+    min-height: 65%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    padding: 25px;
+}
+
+.welcome-logo {
+    width: 58px;
+    height: 58px;
+    border: 1px solid #444;
+    border-radius: 20px;
+    display: grid;
+    place-items: center;
+    font-size: 27px;
+    background: #171717;
+}
+
+.welcome h1 {
+    font-size: 24px;
+    margin: 5px 0 0;
+    font-weight: 650;
+}
+
+.welcome p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 340px;
+}
+
+/* MESSAGES */
+
+.message {
+    margin: 0 0 25px;
+    line-height: 1.65;
+    font-size: 15px;
+    overflow-wrap: anywhere;
+}
+
+.message.user {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.message.user .bubble {
+    max-width: 88%;
+    background: #252525;
+    padding: 11px 15px;
+    border-radius: 19px;
+    white-space: pre-wrap;
+}
+
+.message.assistant {
+    display: block;
+}
+
+.message-label {
+    font-size: 13px;
+    font-weight: 650;
+    color: #f0f0f0;
+    margin-bottom: 9px;
+}
+
+.message-content {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.message-content p {
+    margin: 0 0 12px;
+}
+
+/* CODE BLOCKS */
+
+.code-card {
+    margin: 14px 0;
+    border: 1px solid #343434;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0d0d0d;
+}
+
+.code-header {
+    min-height: 39px;
+    padding: 7px 11px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #191919;
+    border-bottom: 1px solid #303030;
+}
+
+.code-language {
+    color: #b5b5b5;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+}
+
+.copy-button {
+    color: #cccccc;
+    background: transparent;
+    border: 0;
+    border-radius: 6px;
+    padding: 5px 8px;
+    font-size: 12px;
+}
+
+.copy-button:active {
+    background: #333;
+}
+
+.code-card pre {
+    margin: 0;
+    padding: 14px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 13px;
+    line-height: 1.6;
+    tab-size: 4;
+}
+
+.code-card code {
+    font-family: "SFMono-Regular", Consolas, monospace;
+}
+
+/* COMPOSER */
+
+.composer-area {
+    flex-shrink: 0;
+    padding: 10px 12px max(12px, env(safe-area-inset-bottom));
+    background: linear-gradient(to bottom, #080808, #080808);
+}
+
+.composer {
+    width: 100%;
+    max-width: 820px;
+    margin: 0 auto;
+    border: 1px solid #424242;
+    border-radius: 25px;
+    background: #202020;
+    padding: 10px 11px;
+    display: flex;
+    align-items: flex-end;
+    gap: 9px;
+}
+
+.composer textarea {
+    flex: 1;
+    min-width: 0;
+    max-height: 160px;
+    min-height: 27px;
+    resize: none;
+    outline: none;
+    border: 0;
+    background: transparent;
+    color: white;
+    padding: 5px 2px;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.composer textarea::placeholder {
+    color: #999;
+}
+
+.send-button {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 50%;
+    background: white;
+    color: #111;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.send-button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+.footer-note {
+    text-align: center;
+    font-size: 10px;
+    color: #777;
+    padding-top: 8px;
+}
+
+/* STATUS */
+
+.status {
+    display: none;
+    max-width: 820px;
+    margin: 0 auto 12px;
+    width: 100%;
+    border: 1px solid #55402a;
+    background: #21190f;
+    color: #e7bd88;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.status.visible {
+    display: block;
+}
+
+.typing {
+    color: #999;
+    font-size: 13px;
+    padding: 8px 0 18px;
+}
+
+/* DESKTOP */
+
+@media (min-width: 800px) {
+    .header {
+        padding: 0 25px;
+    }
+
+    .conversation {
+        padding: 30px 25px;
+    }
+
+    .composer-area {
+        padding-left: 25px;
+        padding-right: 25px;
+    }
+
+    .message {
+        font-size: 15px;
+    }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+    <header class="header">
+        <div class="header-left">
+            <button class="icon-button" id="historyButton"
+                    aria-label="Conversation history">☰</button>
+            <div class="brand">Coding Assistant</div>
+        </div>
+
+        <div class="header-actions">
+            <button class="icon-button" id="newChatButton"
+                    aria-label="New conversation">＋</button>
+            <button class="icon-button" id="menuButton"
+                    aria-label="More options">⋮</button>
+        </div>
+    </header>
+
+    <main class="conversation" id="conversation">
+        <div class="messages" id="messages">
+
+            <section class="welcome" id="welcome">
+                <div class="welcome-logo">⌘</div>
+                <h1>What are we building?</h1>
+                <p>
+                    Describe your project, explain a problem,
+                    or ask me to write complete code for you.
+                </p>
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="composer-area">
+        <div class="status" id="status"></div>
+
+        <form class="composer" id="composer">
+            <button type="button" class="icon-button"
+                    id="attachButton" aria-label="Attach file">＋</button>
+
+            <textarea id="prompt"
+                      rows="1"
+                      placeholder="Message Coding Assistant..."
+                      aria-label="Your message"></textarea>
+
+            <button class="send-button" id="sendButton"
+                    type="submit" aria-label="Send message">↑</button>
+        </form>
+
+        <div class="footer-note">
+            Coding Assistant · Review generated code before running it
+        </div>
+    </footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+
+<script>
+"use strict";
+
+const messages = document.getElementById("messages");
+const conversation = document.getElementById("conversation");
+const promptBox = document.getElementById("prompt");
+const composer = document.getElementById("composer");
+const sendButton = document.getElementById("sendButton");
+const statusBox = document.getElementById("status");
+
+let conversationId = null;
+let sending = false;
+
+function showStatus(message) {
+    statusBox.textContent = message;
+    statusBox.classList.add("visible");
+}
+
+function hideStatus() {
+    statusBox.textContent = "";
+    statusBox.classList.remove("visible");
+}
+
+function scrollToBottom() {
+    conversation.scrollTop = conversation.scrollHeight;
+}
+
+function createMessage(role, content) {
+    const wrapper = document.createElement("article");
+    wrapper.className = "message " + role;
+
+    if (role === "user") {
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.textContent = content;
+        wrapper.appendChild(bubble);
+    } else {
+        const label = document.createElement("div");
+        label.className = "message-label";
+        label.textContent = "Coding Assistant";
+
+        const body = document.createElement("div");
+        body.className = "message-content";
+        renderMarkdown(body, content);
+
+        wrapper.append(label, body);
+    }
+
+    messages.appendChild(wrapper);
+    scrollToBottom();
+    return wrapper;
+}
+
+/*
+ * Minimal safe Markdown renderer.
+ * Raw HTML from AI responses is never inserted into the page.
+ */
+function renderMarkdown(container, source) {
+    const parts = String(source).split(/```([a-zA-Z0-9_+-]*)\n([\s\S]*?)```/g);
+
+    for (let i = 0; i < parts.length; i++) {
+        if (i % 3 === 0) {
+            const text = parts[i];
+            if (!text) continue;
+
+            const paragraph = document.createElement("p");
+            paragraph.textContent = text;
+            container.appendChild(paragraph);
+        } else if (i % 3 === 1) {
+            const language = parts[i] || "code";
+            const codeText = parts[i + 1] || "";
+
+            const card = document.createElement("section");
+            card.className = "code-card";
+
+            const header = document.createElement("div");
+            header.className = "code-header";
+
+            const languageLabel = document.createElement("span");
+            languageLabel.className = "code-language";
+            languageLabel.textContent = language;
+
+            const copy = document.createElement("button");
+            copy.className = "copy-button";
+            copy.type = "button";
+            copy.textContent = "Copy code";
+
+            copy.addEventListener("click", async () => {
+                try {
+                    await navigator.clipboard.writeText(codeText);
+                    copy.textContent = "Copied!";
+                    setTimeout(() => copy.textContent = "Copy code", 1500);
+                } catch {
+                    copy.textContent = "Copy unavailable";
+                }
+            });
+
+            header.append(languageLabel, copy);
+
+            const pre = document.createElement("pre");
+            const code = document.createElement("code");
+            code.className = "language-" + language;
+            code.textContent = codeText;
+
+            pre.appendChild(code);
+            card.append(header, pre);
+            container.appendChild(card);
+
+            if (window.hljs) {
+                try {
+                    hljs.highlightElement(code);
+                } catch {
+                    // Plain code remains readable if highlighting fails.
+                }
+            }
+
+            i++;
+        }
+    }
+}
+
+function resetConversation() {
+    conversationId = null;
+    messages.replaceChildren();
+
+    const welcome = document.createElement("section");
+    welcome.className = "welcome";
+    welcome.innerHTML = `
+        <div class="welcome-logo">⌘</div>
+        <h1>What are we building?</h1>
+        <p>Describe your project, explain a problem,
+        or ask me to write complete code for you.</p>
+    `;
+
+    messages.appendChild(welcome);
+    hideStatus();
+}
+
+async function sendMessage(text) {
+    if (sending || !text.trim()) return;
+
+    sending = true;
+    sendButton.disabled = true;
+    hideStatus();
+
+    const cleanText = text.trim();
+    const welcome = document.getElementById("welcome");
+    if (welcome) welcome.remove();
+
+    createMessage("user", cleanText);
+    promptBox.value = "";
+    promptBox.style.height = "27px";
+
+    const typing = document.createElement("div");
+    typing.className = "typing";
+    typing.textContent = "Coding Assistant is thinking...";
+    messages.appendChild(typing);
+    scrollToBottom();
+
+    try {
+        /*
+         * Backend endpoint to be implemented in the next stage.
+         * It must authenticate the session and call the real AI engine.
+         */
+        const response = await fetch("/api/coding-assistant/chat", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: cleanText,
+                conversation_id: conversationId
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(
+                response.status === 404
+                ? "The chat backend is not connected yet. We are building it next."
+                : "The assistant server returned error " + response.status + "."
+            );
+        }
+
+        const data = await response.json();
+
+        if (data.conversation_id) {
+            conversationId = data.conversation_id;
+        }
+
+        typing.remove();
+
+        if (typeof data.reply !== "string" || !data.reply.trim()) {
+            throw new Error("The AI service returned an empty response.");
+        }
+
+        createMessage("assistant", data.reply);
+
+    } catch (error) {
+        typing.remove();
+        showStatus(error.message || "Unable to contact the assistant server.");
+    } finally {
+        sending = false;
+        sendButton.disabled = false;
+        promptBox.focus();
+    }
+}
+
+composer.addEventListener("submit", event => {
+    event.preventDefault();
+    sendMessage(promptBox.value);
+});
+
+promptBox.addEventListener("input", () => {
+    promptBox.style.height = "27px";
+    promptBox.style.height =
+        Math.min(promptBox.scrollHeight, 160) + "px";
+});
+
+promptBox.addEventListener("keydown", event => {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        composer.requestSubmit();
+    }
+});
+
+document.getElementById("newChatButton").addEventListener(
+    "click", resetConversation
+);
+
+document.getElementById("historyButton").addEventListener("click", () => {
+    showStatus("Conversation history will be connected to persistent storage.");
+});
+
+document.getElementById("menuButton").addEventListener("click", () => {
+    showStatus("Assistant settings will be added after the chat backend.");
+});
+
+document.getElementById("attachButton").addEventListener("click", () => {
+    showStatus("Project file attachments will be added in the project integration stage.");
+});
+</script>
+</body>
+</html>

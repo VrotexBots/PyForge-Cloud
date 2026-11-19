@@ -1,3 +1,9 @@
-Flask
-gunicorn
+cat > requirements.txt << 'EOF'
+fastapi
+uvicorn[standard]
+pydantic
+python-multipart
 requests
+httpx
+EOF
+cat requirements.txt
